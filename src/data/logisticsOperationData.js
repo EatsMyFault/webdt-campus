@@ -3,7 +3,8 @@
  *
  * 트럭 한 대는 아래 순서를 반복한다.
  *
- *   배차 대기 → 입차 → 도크 대기 → 도킹 → 상·하차 → 출차 → 배차 대기
+ *   배차 대기 → 입차 → 도크 대기 → 도킹 → 상·하차 → 출차
+ *   → 단지 외곽 순환 → 배차 대기
  *
  * 각 단계는 UI에 그대로 노출되므로 라벨과 상태값을 여기서 관리한다.
  */
@@ -61,6 +62,15 @@ export const LOGISTICS_STAGES = Object.freeze({
     dockLabel: "도크 정리 중",
     dockStatus: "idle",
     alert: "작업을 마치고 출차 게이트로 이동 중입니다.",
+  }),
+
+  circulating: Object.freeze({
+    id: "circulating",
+    label: "단지 순환 운행",
+    status: "running",
+    dockLabel: "배정 가능",
+    dockStatus: "idle",
+    alert: "출차 후 단지 외곽 순환도로를 한 바퀴 주행 중입니다.",
   }),
 });
 

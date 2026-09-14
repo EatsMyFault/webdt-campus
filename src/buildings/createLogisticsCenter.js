@@ -4,7 +4,9 @@ import {
   createLogisticsCenterInterior,
 } from "../interiors/createLogisticsCenterInterior.js";
 import {
+  LOGISTICS_CAMPUS_LOOP,
   LOGISTICS_DOCK_X,
+  LOGISTICS_YARD,
 } from "../config/logisticsYardConfig.js";
 
 function createBox({
@@ -605,6 +607,28 @@ function addTruckYard(
       name: "logistics-truck-yard",
       size: [450, 0.12, 104],
       position: [0, 0.9, 104],
+      material: materials.yard,
+      castShadow: false,
+    }),
+    createBox({
+      name: "logistics-entry-connector-road",
+      size: [58, 0.13, 94],
+      position: [
+        LOGISTICS_YARD.entryGateX + 11,
+        0.9,
+        188,
+      ],
+      material: materials.yard,
+      castShadow: false,
+    }),
+    createBox({
+      name: "logistics-exit-connector-road",
+      size: [104, 0.13, 78],
+      position: [
+        (225 + LOGISTICS_CAMPUS_LOOP.eastX) / 2,
+        0.9,
+        184,
+      ],
       material: materials.yard,
       castShadow: false,
     }),

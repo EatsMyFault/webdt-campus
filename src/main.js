@@ -38,6 +38,10 @@ import {
 } from "./scene/keyboardMovementController.js";
 
 import {
+  createEquipmentStatusVisualController,
+} from "./scene/equipmentStatusVisualController.js";
+
+import {
   loadProductionFactory,
 } from "./buildings/loadProductionFactory.js";
 
@@ -66,6 +70,14 @@ import {
 } from "./animations/logisticsOperationController.js";
 
 import {
+  createScenarioEngine,
+} from "./simulation/scenarioEngine.js";
+
+import {
+  FACTORY_A_OVERHEAT_SCENARIO,
+} from "./simulation/scenarios/factoryAOverheatScenario.js";
+
+import {
   createFactoryDoorController,
 } from "./interactions/factoryDoorController.js";
 
@@ -86,9 +98,20 @@ import {
 } from "./ui/siteControlPanel.js";
 
 import {
+  createCampusClock,
+} from "./ui/campusClock.js";
+
+import {
+  createScenarioPanel,
+} from "./ui/scenarioPanel.js";
+
+import {
   EQUIPMENT_DATA,
-  getEquipmentById,
 } from "./data/equipmentDataRegistry.js";
+
+import {
+  createEquipmentStore,
+} from "./data/equipmentStore.js";
 
 import {
   UTILITY_FLOW_DATA,
@@ -244,6 +267,23 @@ const pipeFlowController =
 const logisticsOperationController =
   createLogisticsOperationController({
     root: logisticsCenter.group,
+  });
+
+/*
+ * 정적 더미 데이터를 복제해 현재 설비 상태를 보관한다.
+ * 시나리오와 향후 API/WebSocket은 이 Store만 갱신한다.
+ */
+const equipmentStore = createEquipmentStore(
+  EQUIPMENT_DATA,
+);
+
+/*
+ * Store 상태를 A동 설비의 상태등 색상과 점멸에 반영한다.
+ */
+const equipmentStatusVisualController =
+  createEquipmentStatusVisualController({
+    roots: [factory.interior],
+    store: equipmentStore,
   });
 
 /*
@@ -486,7 +526,9 @@ equipmentSelectionController =
       const equipment =
         logisticsOperationController
           .createLiveEquipment(equipmentId) ??
-        getEquipmentById(equipmentId);
+        equipmentStore.getEquipmentById(
+          equipmentId,
+        );
 
       if (equipment) {
         selectedEquipmentFacilityId =
@@ -905,6 +947,52 @@ function moveToViewpoint(viewId) {
 
 
 /*
+ * 첫 데모 시나리오: A동 CNC 과열 → 정지 → 복구.
+ */
+const scenarioEngine = createScenarioEngine({
+  store: equipmentStore,
+  scenario: FACTORY_A_OVERHEAT_SCENARIO,
+
+  onStep({ step, scenario }) {
+    if (step.focusViewId) {
+      moveToViewpoint(step.focusViewId);
+    }
+
+    if (step.openDetail) {
+      const equipment =
+        equipmentStore.getEquipmentById(
+          scenario.targetEquipmentId,
+        );
+
+      if (equipment) {
+        selectedEquipmentFacilityId =
+          equipment.facilityId;
+        equipmentDetailPanel.open(equipment);
+      }
+    }
+  },
+
+  onReset({ scenario }) {
+    const equipment =
+      equipmentStore.getEquipmentById(
+        scenario.targetEquipmentId,
+      );
+
+    if (equipment) {
+      equipmentDetailPanel.refresh(equipment);
+    }
+  },
+});
+
+const scenarioPanel = createScenarioPanel({
+  root: document.querySelector(
+    "#scenario-panel",
+  ),
+  engine: scenarioEngine,
+});
+
+
+/*
  * 시점 버튼 클릭
  */
 function handleViewpointClick(event) {
@@ -995,12 +1083,15 @@ const siteControlPanel =
     root: document.querySelector(
       "#site-control-panel",
     ),
-    equipment: EQUIPMENT_DATA,
+    equipment: equipmentStore.getAllEquipment(),
 
     getLiveStatus: (equipmentId) =>
       logisticsOperationController.getLiveStatus(
         equipmentId,
-      ),
+      ) ??
+      equipmentStore.getEquipmentById(
+        equipmentId,
+      )?.status,
 
     getLogisticsSummary: () =>
       logisticsOperationController.getLogisticsSummary(),
@@ -1009,6 +1100,19 @@ const siteControlPanel =
       moveToViewpoint(facilityId);
     },
   });
+
+
+/*
+ * 화면 상단 현재 날짜·시각
+ */
+const campusClock = createCampusClock({
+  dateElement: document.querySelector(
+    "#campus-clock-date",
+  ),
+  timeElement: document.querySelector(
+    "#campus-clock-time",
+  ),
+});
 
 
 /*
@@ -1063,17 +1167,17 @@ resizeObserver.observe(container);
 
 
 /*
- * 물류 상세정보 갱신 주기(초).
+ * 설비 상세정보 갱신 주기(초).
  * 매 프레임 다시 그릴 필요는 없으므로 간격을 둔다.
  */
-const LOGISTICS_DETAIL_REFRESH_INTERVAL = 0.25;
+const EQUIPMENT_DETAIL_REFRESH_INTERVAL = 0.25;
 
 /*
  * 단지 관제 패널 갱신 주기(초)
  */
 const SITE_PANEL_REFRESH_INTERVAL = 0.5;
 
-let logisticsDetailRefreshTimer = 0;
+let equipmentDetailRefreshTimer = 0;
 let sitePanelRefreshTimer = 0;
 
 
@@ -1090,26 +1194,28 @@ function updateSiteControlPanel(deltaSeconds) {
     return;
   }
 
+  const elapsedSeconds = sitePanelRefreshTimer;
+
   sitePanelRefreshTimer = 0;
-  siteControlPanel.update();
+  siteControlPanel.update(elapsedSeconds);
 }
 
 
 /*
- * 물류 설비 상세정보가 열려 있으면
- * 트럭 운행 상태를 반영해 다시 그린다.
+ * 상세정보가 열려 있으면 Store 또는 물류 운행 상태를
+ * 반영해 다시 그린다.
  */
-function updateLogisticsDetail(deltaSeconds) {
-  logisticsDetailRefreshTimer += deltaSeconds;
+function updateEquipmentDetail(deltaSeconds) {
+  equipmentDetailRefreshTimer += deltaSeconds;
 
   if (
-    logisticsDetailRefreshTimer <
-    LOGISTICS_DETAIL_REFRESH_INTERVAL
+    equipmentDetailRefreshTimer <
+    EQUIPMENT_DETAIL_REFRESH_INTERVAL
   ) {
     return;
   }
 
-  logisticsDetailRefreshTimer = 0;
+  equipmentDetailRefreshTimer = 0;
 
   if (!equipmentDetailPanel.isOpen()) {
     return;
@@ -1123,7 +1229,9 @@ function updateLogisticsDetail(deltaSeconds) {
   }
 
   const equipment =
-    logisticsOperationController.createLiveEquipment(
+    logisticsOperationController
+      .createLiveEquipment(equipmentId) ??
+    equipmentStore.getEquipmentById(
       equipmentId,
     );
 
@@ -1166,6 +1274,7 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
+  campusClock.update();
   graphicsQualityController.update();
   facilityLabelController.update();
 
@@ -1189,8 +1298,15 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
+  scenarioEngine.update(deltaSeconds);
+  scenarioPanel.update();
+
+  equipmentStatusVisualController.update(
+    animationTime / 1000,
+  );
+
   equipmentSelectionController.update();
-  updateLogisticsDetail(deltaSeconds);
+  updateEquipmentDetail(deltaSeconds);
   updateSiteControlPanel(deltaSeconds);
 
   sceneSystem.controls.update();
@@ -1306,6 +1422,8 @@ window.addEventListener(
     facilityLabelController.destroy();
     pipeFlowController.destroy();
     logisticsOperationController.destroy();
+    scenarioPanel.destroy();
+    equipmentStatusVisualController.destroy();
     siteControlPanel.destroy();
     graphicsQualityController.destroy();
 

@@ -9,9 +9,9 @@ import {
  * 로드한 뒤 createLogisticsCenter에서 clone하여 사용한다.
  */
 const TRUCK_MODEL_SOURCES = Object.freeze({
-  box: "/models/vehicles/box-truck.glb",
+  box: `${import.meta.env.BASE_URL}models/vehicles/box-truck.glb`,
   curtainside:
-    "/models/vehicles/curtainside-truck.glb",
+    `${import.meta.env.BASE_URL}models/vehicles/curtainside-truck.glb`,
 });
 
 function prepareTemplate(scene, modelId) {
