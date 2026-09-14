@@ -1,3 +1,6 @@
+import { LOGISTICS_CENTER } from "./buildingConfig.js";
+import { SITE } from "./siteConfig.js";
+
 /*
  * 물류센터 야드 좌표계.
  *
@@ -5,6 +8,7 @@
  * 도크 셔터를 세우는 createLogisticsCenter와 트럭 주행 경로를 만드는
  * logisticsOperationController가 같은 값을 보도록 한곳에 모아둔다.
  *
+ *      z=223  ── 단지 남측 외곽 순환도로 ─────────────
  *      z=186  ── 정문 ───────────────── 출차 게이트 ──
  *      z=150  ── 출차 레인 ────────────────────────→
  *      z=128  ── 입차 레인 ────────────────────────→
@@ -24,6 +28,28 @@ export const LOGISTICS_DOCK_X = Object.freeze([
   145,
   190,
 ]);
+
+/*
+ * createSite가 만드는 외곽 순환도로의 중심선을 물류센터 로컬 좌표로
+ * 변환한다. 부지 크기가 바뀌어도 트럭 경로가 도로 밖으로 밀리지 않는다.
+ */
+const perimeterInset = SITE.roadWidth / 2 + 16;
+const loopRoadX = SITE.width / 2 - perimeterInset;
+const loopRoadZ = SITE.depth / 2 - perimeterInset;
+const logisticsCenterX = LOGISTICS_CENTER.position[0];
+const logisticsCenterZ = LOGISTICS_CENTER.position[2];
+
+export const LOGISTICS_CAMPUS_LOOP = Object.freeze({
+  eastX: loopRoadX - logisticsCenterX,
+  westX: -loopRoadX - logisticsCenterX,
+  northZ: -loopRoadZ - logisticsCenterZ,
+  southZ: loopRoadZ - logisticsCenterZ,
+
+  /*
+   * 긴 외곽 순환 구간은 야드보다 조금 빠르게 주행한다.
+   */
+  speedMultiplier: 1.75,
+});
 
 export const LOGISTICS_YARD = Object.freeze({
   /*
@@ -45,9 +71,9 @@ export const LOGISTICS_YARD = Object.freeze({
   gateZ: 186,
 
   /*
-   * 출차 후 사이트를 빠져나가는 지점
+   * 출차 후 단지 남측 외곽 순환도로에 합류하는 지점
    */
-  offsiteZ: 250,
+  offsiteZ: LOGISTICS_CAMPUS_LOOP.southZ,
 
   /*
    * 배차를 기다리는 정문 밖 대기열

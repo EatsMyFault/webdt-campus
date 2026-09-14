@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import {
+  LOGISTICS_CAMPUS_LOOP,
   LOGISTICS_YARD,
   getDockX,
 } from "../config/logisticsYardConfig.js";
@@ -28,12 +29,6 @@ const MAX_DELTA_SECONDS = 0.05;
 const TURN_RATE = 2.4;
 
 /*
- * 출차한 트럭이 정문 밖 대기열로 되돌아가는 동안
- * 잠깐 화면에서 감춰 위치가 튀는 것을 가린다.
- */
-const RESET_HIDE_DURATION = 2.4;
-
-/*
  * 도착 판정 거리
  */
 const ARRIVAL_EPSILON = 0.05;
@@ -55,11 +50,14 @@ function formatClock(time) {
  * 트럭 한 대의 전체 주행 경로.
  *
  *   정문 → 대기 위치 → 배정 도크 → 출차 위치
+ *   → 단지 외곽 순환도로 한 바퀴 → 정문 밖 대기열
  */
-function createRoute(plan) {
+export function createLogisticsRoute(plan) {
   const dockX = getDockX(plan.dockNumber);
   const waitX = dockX + LOGISTICS_YARD.waitOffsetX;
   const dockLabel = `${plan.dockNumber}번 도크`;
+  const loopSpeed =
+    plan.driveSpeed * LOGISTICS_CAMPUS_LOOP.speedMultiplier;
 
   const standby = {
     x:
@@ -157,6 +155,50 @@ function createRoute(plan) {
         gateOut: true,
       },
     ],
+
+    /*
+     * 남측 도로에서 출차한 뒤 동 → 북 → 서 → 남 순서로
+     * 단지 외곽을 한 바퀴 돌고 자신의 대기 위치로 돌아온다.
+     */
+    circulating: [
+      {
+        target: {
+          x: LOGISTICS_CAMPUS_LOOP.eastX,
+          z: LOGISTICS_CAMPUS_LOOP.southZ,
+        },
+        speed: loopSpeed,
+        zone: "단지 남동측 순환도로",
+      },
+      {
+        target: {
+          x: LOGISTICS_CAMPUS_LOOP.eastX,
+          z: LOGISTICS_CAMPUS_LOOP.northZ,
+        },
+        speed: loopSpeed,
+        zone: "단지 동측 순환도로",
+      },
+      {
+        target: {
+          x: LOGISTICS_CAMPUS_LOOP.westX,
+          z: LOGISTICS_CAMPUS_LOOP.northZ,
+        },
+        speed: loopSpeed,
+        zone: "단지 북측 순환도로",
+      },
+      {
+        target: {
+          x: LOGISTICS_CAMPUS_LOOP.westX,
+          z: LOGISTICS_CAMPUS_LOOP.southZ,
+        },
+        speed: loopSpeed,
+        zone: "단지 서측 순환도로",
+      },
+      {
+        target: standby,
+        speed: loopSpeed,
+        zone: "단지 남측 순환도로",
+      },
+    ],
   };
 }
 
@@ -191,7 +233,7 @@ function createTruckState(plan, root) {
   return {
     plan,
     object,
-    route: createRoute(plan),
+    route: createLogisticsRoute(plan),
     groundY: object.position.y,
 
     stageId: "standby",
@@ -212,7 +254,6 @@ function createTruckState(plan, root) {
     dockedAt: null,
     gateOutAt: null,
     cycleCount: 0,
-    hidden: false,
   };
 }
 
@@ -278,7 +319,7 @@ export function createLogisticsOperationController({
     state.alertOverride = null;
   }
 
-  function moveToStandby(state, { hidden }) {
+  function moveToStandby(state) {
     const { standby } = state.route;
 
     state.object.position.set(
@@ -291,8 +332,7 @@ export function createLogisticsOperationController({
      * 대기열에서는 정문 방향(+x)을 보고 선다.
      */
     state.object.rotation.y = Math.PI / 2;
-    state.object.visible = !hidden;
-    state.hidden = hidden;
+    state.object.visible = true;
     state.progress = 0;
     state.holdRemaining = 0;
     state.holdDone = false;
@@ -403,14 +443,6 @@ export function createLogisticsOperationController({
         ? state.plan.dispatchDelay
         : state.plan.standbyDuration;
 
-    if (
-      state.hidden &&
-      state.stageTimer >= RESET_HIDE_DURATION
-    ) {
-      state.object.visible = true;
-      state.hidden = false;
-    }
-
     if (state.stageTimer < waitTarget) {
       return;
     }
@@ -511,8 +543,16 @@ export function createLogisticsOperationController({
     }
 
     releaseLane(state);
+    enterStage(state, "circulating");
+  }
+
+  function updateCirculating(state, deltaSeconds) {
+    if (!followLegs(state, deltaSeconds)) {
+      return;
+    }
+
     state.cycleCount += 1;
-    moveToStandby(state, { hidden: true });
+    moveToStandby(state);
   }
 
   const STAGE_UPDATERS = {
@@ -522,6 +562,7 @@ export function createLogisticsOperationController({
     docking: updateDocking,
     handling: updateHandling,
     departing: updateDeparting,
+    circulating: updateCirculating,
   };
 
   function update(deltaSeconds) {
@@ -841,7 +882,7 @@ export function createLogisticsOperationController({
   }
 
   states.forEach((state) => {
-    moveToStandby(state, { hidden: false });
+    moveToStandby(state);
   });
 
   return {
