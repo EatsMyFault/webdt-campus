@@ -113,7 +113,84 @@ function createZone(zone) {
   return group;
 }
 
-function createRoadMarkings(group, site) {
+/*
+ * 모서리가 둥근 사각형 경로.
+ * 셰이프를 눕히므로 y축은 -z에 해당하지만,
+ * 원점 대칭이라 부호를 신경 쓸 필요가 없다.
+ */
+function traceRoundedRect(path, halfWidth, halfDepth, radius) {
+  const r = Math.max(
+    0,
+    Math.min(radius, halfWidth, halfDepth),
+  );
+
+  path.moveTo(-halfWidth + r, -halfDepth);
+  path.lineTo(halfWidth - r, -halfDepth);
+  path.absarc(halfWidth - r, -halfDepth + r, r, -Math.PI / 2, 0);
+  path.lineTo(halfWidth, halfDepth - r);
+  path.absarc(halfWidth - r, halfDepth - r, r, 0, Math.PI / 2);
+  path.lineTo(-halfWidth + r, halfDepth);
+  path.absarc(-halfWidth + r, halfDepth - r, r, Math.PI / 2, Math.PI);
+  path.lineTo(-halfWidth, -halfDepth + r);
+  path.absarc(
+    -halfWidth + r,
+    -halfDepth + r,
+    r,
+    Math.PI,
+    Math.PI * 1.5,
+  );
+  path.closePath();
+
+  return path;
+}
+
+/*
+ * 부지를 한 바퀴 두르는 순환도로.
+ *
+ * 네 변을 사각형 네 장으로 깔면 모서리가 직각으로 꺾인다.
+ * 바깥선과 안쪽선을 각각 둥근 사각형으로 그린 고리 하나로 만들어
+ * 네 모서리를 곡선으로 잇는다.
+ */
+function createLoopRoad({ site, color }) {
+  const perimeterInset = site.roadWidth / 2 + 16;
+  const halfWidth = site.width / 2 - perimeterInset;
+  const halfDepth = site.depth / 2 - perimeterInset;
+  const half = site.roadWidth / 2;
+  const outerRadius = site.roadCornerRadius ?? half * 2;
+
+  const shape = traceRoundedRect(
+    new THREE.Shape(),
+    halfWidth + half,
+    halfDepth + half,
+    outerRadius,
+  );
+
+  shape.holes.push(
+    traceRoundedRect(
+      new THREE.Path(),
+      halfWidth - half,
+      halfDepth - half,
+      outerRadius - site.roadWidth,
+    ),
+  );
+
+  const mesh = new THREE.Mesh(
+    new THREE.ShapeGeometry(shape, 24),
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.95,
+    }),
+  );
+
+  mesh.name = "perimeter-loop-road";
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = 0.045;
+  mesh.receiveShadow = true;
+
+  return mesh;
+}
+
+function createRoadMarkings(group, site, originZ) {
   const markingMaterial = new THREE.MeshBasicMaterial({
     color: 0xf6f0ce,
     transparent: true,
@@ -157,7 +234,7 @@ function createRoadMarkings(group, site) {
     );
 
     marking.rotation.x = -Math.PI / 2;
-    marking.position.set(x, 0.095, 0);
+    marking.position.set(x, 0.095, originZ);
     group.add(marking);
   }
 }
@@ -302,6 +379,19 @@ export function createSite(scene, site) {
 
   siteGroup.name = "factory-campus-site";
 
+  /*
+   * 부지 사각형은 원점이 아니라 centerZ 를 중심으로 놓인다.
+   * 지면·도로·담장은 이 그룹에 담고, 원점에 고정돼야 하는
+   * 로터리와 교차로만 originZ 만큼 되돌려 붙인다.
+   */
+  const centerZ = site.centerZ ?? 0;
+  const originZ = -centerZ;
+  const baseGroup = new THREE.Group();
+
+  baseGroup.name = "campus-site-base";
+  baseGroup.position.z = centerZ;
+  siteGroup.add(baseGroup);
+
   const worldGround = createSurface({
     name: "world-ground",
     width: site.worldWidth,
@@ -320,52 +410,18 @@ export function createSite(scene, site) {
 
   const roadColor = 0x65737a;
   const perimeterInset = site.roadWidth / 2 + 16;
-  const roadInsetX = site.width / 2 - perimeterInset;
-  const roadInsetZ = site.depth / 2 - perimeterInset;
   const horizontalRoadLength =
     site.width - perimeterInset * 2;
   const verticalRoadLength =
     site.depth - perimeterInset * 2;
   const centralRoadWidth = 40;
 
-  siteGroup.add(
+  baseGroup.add(
     worldGround,
     parcel,
-    createSurface({
-      name: "north-loop-road",
-      width: horizontalRoadLength,
-      depth: site.roadWidth,
+    createLoopRoad({
+      site,
       color: roadColor,
-      y: 0.045,
-      z: -roadInsetZ,
-      surfaceLayer: 1,
-    }),
-    createSurface({
-      name: "south-loop-road",
-      width: horizontalRoadLength,
-      depth: site.roadWidth,
-      color: roadColor,
-      y: 0.045,
-      z: roadInsetZ,
-      surfaceLayer: 1,
-    }),
-    createSurface({
-      name: "west-loop-road",
-      width: site.roadWidth,
-      depth: verticalRoadLength,
-      color: roadColor,
-      x: -roadInsetX,
-      y: 0.045,
-      surfaceLayer: 1,
-    }),
-    createSurface({
-      name: "east-loop-road",
-      width: site.roadWidth,
-      depth: verticalRoadLength,
-      color: roadColor,
-      x: roadInsetX,
-      y: 0.045,
-      surfaceLayer: 1,
     }),
     createSurface({
       name: "central-road",
@@ -381,7 +437,7 @@ export function createSite(scene, site) {
       depth: centralRoadWidth,
       color: roadColor,
       y: 0.06,
-      z: 0,
+      z: originZ,
       surfaceLayer: 1,
     }),
     createSurface({
@@ -410,7 +466,7 @@ export function createSite(scene, site) {
   roundabout.geometry.dispose();
   roundabout.geometry = new THREE.CircleGeometry(46, 64);
   roundabout.rotation.x = -Math.PI / 2;
-  roundabout.position.set(0, 0.075, 0);
+  roundabout.position.set(0, 0.075, originZ);
 
   const roundaboutIsland = createSurface({
     name: "roundabout-island",
@@ -423,13 +479,13 @@ export function createSite(scene, site) {
   roundaboutIsland.geometry.dispose();
   roundaboutIsland.geometry = new THREE.CircleGeometry(18, 48);
   roundaboutIsland.rotation.x = -Math.PI / 2;
-  roundaboutIsland.position.set(0, 0.095, 0);
+  roundaboutIsland.position.set(0, 0.095, originZ);
 
-  siteGroup.add(roundabout, roundaboutIsland);
+  baseGroup.add(roundabout, roundaboutIsland);
 
-  createRoadMarkings(siteGroup, site);
-  createBoundary(siteGroup, site);
-  createTrees(siteGroup, site);
+  createRoadMarkings(baseGroup, site, originZ);
+  createBoundary(baseGroup, site);
+  createTrees(baseGroup, site);
 
   scene.add(siteGroup);
 

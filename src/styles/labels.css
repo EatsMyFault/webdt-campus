@@ -87,3 +87,12 @@
 .logistics-building-label span {
   color: #a96824;
 }
+
+.office-building-label .facility-label-visual {
+  border-color: rgba(73, 110, 125, 0.34);
+  border-left-color: #496e7d;
+}
+
+.office-building-label span {
+  color: #496e7d;
+}

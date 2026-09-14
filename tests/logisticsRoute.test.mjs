@@ -31,13 +31,17 @@ test("출차 트럭은 외곽 순환도로 한 바퀴를 돌고 대기열로 복
     LOGISTICS_CAMPUS_LOOP.westX,
     -roadX - LOGISTICS_CENTER.position[0],
   );
+  /*
+   * 부지가 원점 대칭이 아니므로 남·북 도로는
+   * 부지 중심(SITE.centerZ)을 기준으로 잡힌다.
+   */
   assert.equal(
     LOGISTICS_CAMPUS_LOOP.northZ,
-    -roadZ - LOGISTICS_CENTER.position[2],
+    SITE.centerZ - roadZ - LOGISTICS_CENTER.position[2],
   );
   assert.equal(
     LOGISTICS_CAMPUS_LOOP.southZ,
-    roadZ - LOGISTICS_CENTER.position[2],
+    SITE.centerZ + roadZ - LOGISTICS_CENTER.position[2],
   );
 
   const exitTarget = route.departing.at(-1).target;

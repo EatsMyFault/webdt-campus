@@ -3,9 +3,9 @@ export const SITE_VIEWPOINTS = Object.freeze([
     id: "campus-overview",
     shortcut: "0",
     label: "단지 전체",
-    description: "4개 구역 통합 전경",
-    position: [900, 760, 1050],
-    target: [0, 0, 0],
+    description: "5개 주요 시설 통합 전경",
+    position: [756, 658, 983],
+    target: [0, 35, -74],
   },
   {
     id: "factory-a",
@@ -146,5 +146,14 @@ export const SITE_VIEWPOINTS = Object.freeze([
     fov: 32,
     mode: "2d",
     facilityId: "logistics",
+  },
+  {
+    id: "office",
+    shortcut: "5",
+    label: "통합운영 사무동",
+    description: "관제·연구·업무 지원",
+    position: [570, 205, -255],
+    target: [260, 62, -485],
+    fov: 48,
   },
 ]);

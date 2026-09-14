@@ -267,12 +267,6 @@ function createMaterials() {
       color: 0xe6b238,
       roughness: 0.72,
     }),
-    light: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0xf0ffff,
-      emissiveIntensity: 3,
-      roughness: 0.2,
-    }),
   };
 }
 
@@ -724,20 +718,6 @@ function addThermalPipeNetwork(group, materials) {
 }
 
 function addInteriorLighting(group, materials) {
-  [-170, -130, -90, -50, -10].forEach((x) => {
-    [-40, 0, 40].forEach((z) => {
-      group.add(
-        createBox({
-          name: "utility-interior-led-light",
-          size: [10, 0.18, 1.1],
-          position: [x, 25, z],
-          material: materials.light,
-          castShadow: false,
-        }),
-      );
-    });
-  });
-
   [-160, -110, -60, -10].forEach((x) => {
     [-25, 25].forEach((z) => {
       const light = new THREE.PointLight(0xe9ffff, 1.3, 90, 1.7);

@@ -3,16 +3,14 @@
  */
 
 /*
- * 우측 관제 패널 아래에 놓이므로 남는 높이만 쓰고,
+ * 내용만큼만 높이를 쓰고, 세로줄의 절반 가까이를 넘지 않는다.
  * 목록이 길어지면 목록 안에서만 스크롤한다.
  */
 .door-control-panel {
-  top: calc(48px + var(--site-panel-height));
-  right: 24px;
+  flex: 0 1 auto;
   display: flex;
   flex-direction: column;
-  width: 270px;
-  max-height: calc(100vh - 140px - var(--site-panel-height));
+  max-height: 46%;
   padding: 17px;
   overflow: hidden;
   border-radius: 12px;

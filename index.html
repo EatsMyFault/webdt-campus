@@ -41,7 +41,7 @@
 
               <span>
                 <strong>단지 전체</strong>
-                <small>4개 구역 통합 전경</small>
+                <small>5개 주요 시설 통합 전경</small>
               </span>
             </button>
 
@@ -361,10 +361,24 @@
                 </span>
               </button>
             </div>
+
+            <!-- 통합운영 사무동 -->
+            <button
+              type="button"
+              data-viewpoint="office"
+              aria-pressed="false"
+            >
+              <kbd>5</kbd>
+
+              <span>
+                <strong>통합운영 사무동</strong>
+                <small>관제·연구·업무 지원</small>
+              </span>
+            </button>
           </div>
 
           <small class="viewpoint-help">
-            버튼 또는 숫자키 0~4
+            버튼 또는 숫자키 0~5
           </small>
         </nav>
         <!-- 현재 날짜 및 시각 -->
@@ -376,441 +390,395 @@
           <strong id="campus-clock-time">--:--:--</strong>
         </header>
 
-        <!-- 단지 통합 관제 -->
-        <aside
-          id="site-control-panel"
-          class="site-panel"
-          aria-label="단지 통합 관제"
-        >
-          <header class="site-panel-head">
-            <div>
-              <p>SITE CONTROL</p>
-              <h2 id="site-panel-title">단지 통합 관제</h2>
-            </div>
-
-            <small id="site-panel-updated">--:--:--</small>
-          </header>
-
-          <section class="site-summary">
-            <div class="site-summary-total">
-              <small id="site-summary-label">전체 설비</small>
-
-              <strong>
-                <span id="site-total-count">0</span><b>대</b>
-              </strong>
-            </div>
-
-            <ul class="site-status-grid">
-              <li data-status="running">
-                <span>정상</span>
-                <strong id="site-status-running">0</strong>
-              </li>
-
-              <li data-status="warning">
-                <span>경고</span>
-                <strong id="site-status-warning">0</strong>
-              </li>
-
-              <li data-status="idle">
-                <span>대기</span>
-                <strong id="site-status-idle">0</strong>
-              </li>
-
-              <li data-status="stopped">
-                <span>정지</span>
-                <strong id="site-status-stopped">0</strong>
-              </li>
-            </ul>
-          </section>
-
-          <section
-            id="site-kpi-dashboard"
-            class="site-kpi-dashboard"
-            aria-label="금일 운영 KPI"
+        <!-- 우측 관제 세로줄 -->
+        <div class="control-rail">
+          <!-- 단지 통합 관제 -->
+          <aside
+            id="site-control-panel"
+            class="site-panel"
+            aria-label="단지 통합 관제"
           >
-            <header class="site-kpi-dashboard-head">
-              <span>DAILY KPI</span>
-              <h3 id="site-kpi-title">금일 운영 지표</h3>
-              <small id="site-kpi-caption">주간조</small>
+            <header class="site-panel-head">
+              <div>
+                <p>SITE CONTROL</p>
+                <h2 id="site-panel-title">단지 통합 관제</h2>
+              </div>
+
+              <small id="site-panel-updated">--:--:--</small>
             </header>
 
-            <!-- 카드는 현재 시점에 맞춰 siteKpiDashboard가 그린다 -->
-            <div class="site-kpi-grid"></div>
-          </section>
+            <section class="site-summary">
+              <div class="site-summary-total">
+                <small id="site-summary-label">전체 설비</small>
 
-          <section class="site-section">
-            <div class="site-section-head">
-              <span>UTILIZATION</span>
-              <h3 id="site-utilization-title">건물별 가동률</h3>
-            </div>
-
-            <ul
-              id="site-utilization-list"
-              class="site-utilization-list"
-            ></ul>
-          </section>
-
-          <section
-            id="site-logistics-section"
-            class="site-section"
-          >
-            <div class="site-section-head">
-              <span>LOGISTICS</span>
-              <h3>물류 작업 현황</h3>
-            </div>
-
-            <dl class="site-logistics-grid">
-              <div>
-                <dt>상·하차</dt>
-                <dd id="site-logistics-handling">-</dd>
-              </div>
-
-              <div>
-                <dt>구내 운행</dt>
-                <dd id="site-logistics-moving">-</dd>
-              </div>
-
-              <div>
-                <dt>사용 도크</dt>
-                <dd id="site-logistics-docks">-</dd>
-              </div>
-            </dl>
-          </section>
-
-          <section class="site-section site-alert-section">
-            <div class="site-section-head">
-              <span>ALERT</span>
-              <h3>경고 설비</h3>
-              <strong id="site-alert-count">0건</strong>
-            </div>
-
-            <ul
-              id="site-alert-list"
-              class="site-alert-list"
-            ></ul>
-          </section>
-        </aside>
-
-        <!-- 데모 운전 시나리오 -->
-        <aside
-          id="scenario-panel"
-          class="scenario-panel"
-          data-state="idle"
-          aria-label="데모 운전 시나리오"
-        >
-          <header class="scenario-panel-head">
-            <div>
-              <p>DEMO SCENARIO</p>
-              <h2>A동 CNC 과열 대응</h2>
-            </div>
-
-            <span
-              id="scenario-state"
-              class="scenario-state"
-            >
-              대기
-            </span>
-          </header>
-
-          <div
-            class="scenario-progress"
-            role="progressbar"
-            aria-label="시나리오 진행률"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <i id="scenario-progress-fill"></i>
-          </div>
-
-          <div class="scenario-current">
-            <strong id="scenario-stage">
-              시나리오 준비
-            </strong>
-
-            <small id="scenario-time">
-              00:00 / 00:19
-            </small>
-          </div>
-
-          <div class="scenario-actions">
-            <button
-              type="button"
-              data-scenario-action="play"
-            >
-              시나리오 재생
-            </button>
-
-            <button
-              type="button"
-              data-scenario-action="pause"
-              disabled
-            >
-              일시정지
-            </button>
-
-            <button
-              type="button"
-              data-scenario-action="reset"
-              disabled
-            >
-              초기화
-            </button>
-          </div>
-
-          <ul
-            id="scenario-event-list"
-            class="scenario-event-list"
-            aria-live="polite"
-          ></ul>
-        </aside>
-
-        <!-- A동 출입문 제어 -->
-        <aside
-          id="factory-door-panel"
-          class="door-control-panel"
-          aria-label="A동 산업용 출입문 제어"
-          hidden
-        >
-          <p>DOOR CONTROL</p>
-          <h2>A동 산업용 출입문</h2>
-
-          <div class="door-control-list">
-            <section
-              class="door-control-item"
-              data-door-card="A-DOOR-01"
-              data-status="closed"
-            >
-              <div class="door-control-meta">
-                <div>
-                  <strong>1번 출입문</strong>
-                  <span>A-DOOR-01</span>
-                </div>
-
-                <strong data-door-status>
-                  폐쇄
+                <strong>
+                  <span id="site-total-count">0</span><b>대</b>
                 </strong>
               </div>
 
-              <div
-                class="door-progress"
-                aria-hidden="true"
-              >
-                <i data-door-progress></i>
-              </div>
+              <ul class="site-status-grid">
+                <li data-status="running">
+                  <span>정상</span>
+                  <strong id="site-status-running">0</strong>
+                </li>
 
-              <button
-                type="button"
-                data-door-toggle
-                data-door-id="A-DOOR-01"
-              >
-                출입문 개방
-              </button>
+                <li data-status="warning">
+                  <span>경고</span>
+                  <strong id="site-status-warning">0</strong>
+                </li>
+
+                <li data-status="idle">
+                  <span>대기</span>
+                  <strong id="site-status-idle">0</strong>
+                </li>
+
+                <li data-status="stopped">
+                  <span>정지</span>
+                  <strong id="site-status-stopped">0</strong>
+                </li>
+              </ul>
             </section>
 
             <section
-              class="door-control-item"
-              data-door-card="A-DOOR-02"
-              data-status="closed"
+              id="site-kpi-dashboard"
+              class="site-kpi-dashboard"
+              aria-label="금일 운영 KPI"
             >
-              <div class="door-control-meta">
-                <div>
-                  <strong>2번 출입문</strong>
-                  <span>A-DOOR-02</span>
-                </div>
+              <header class="site-kpi-dashboard-head">
+                <span>DAILY KPI</span>
+                <h3 id="site-kpi-title">금일 운영 지표</h3>
+                <small id="site-kpi-caption">주간조</small>
+              </header>
 
-                <strong data-door-status>
-                  폐쇄
-                </strong>
-              </div>
-
-              <div
-                class="door-progress"
-                aria-hidden="true"
-              >
-                <i data-door-progress></i>
-              </div>
-
-              <button
-                type="button"
-                data-door-toggle
-                data-door-id="A-DOOR-02"
-              >
-                출입문 개방
-              </button>
+              <!-- 카드는 현재 시점에 맞춰 siteKpiDashboard가 그린다 -->
+              <div class="site-kpi-grid"></div>
             </section>
-          </div>
 
-          <small>
-            3D 출입문을 직접 클릭해도 작동합니다.
-          </small>
-        </aside>
-
-        <!-- B동 출입문 제어 -->
-        <aside
-          id="factory-b-door-panel"
-          class="door-control-panel factory-b-door-panel"
-          aria-label="B동 조립 출입문 제어"
-          hidden
-        >
-          <p>DOOR CONTROL</p>
-          <h2>B동 조립 출입문</h2>
-
-          <div class="door-control-list">
-            <section
-              class="door-control-item"
-              data-door-card="B-DOOR-01"
-              data-status="closed"
-            >
-              <div class="door-control-meta">
-                <div>
-                  <strong>1번 조립 출입문</strong>
-                  <span>B-DOOR-01</span>
-                </div>
-
-                <strong data-door-status>
-                  폐쇄
-                </strong>
+            <section class="site-section">
+              <div class="site-section-head">
+                <span>UTILIZATION</span>
+                <h3 id="site-utilization-title">건물별 가동률</h3>
               </div>
 
-              <div
-                class="door-progress"
-                aria-hidden="true"
-              >
-                <i data-door-progress></i>
-              </div>
-
-              <button
-                type="button"
-                data-door-toggle
-                data-door-id="B-DOOR-01"
-              >
-                출입문 개방
-              </button>
+              <ul
+                id="site-utilization-list"
+                class="site-utilization-list"
+              ></ul>
             </section>
 
             <section
-              class="door-control-item"
-              data-door-card="B-DOOR-02"
-              data-status="closed"
+              id="site-logistics-section"
+              class="site-section"
             >
-              <div class="door-control-meta">
+              <div class="site-section-head">
+                <span>LOGISTICS</span>
+                <h3>물류 작업 현황</h3>
+              </div>
+
+              <dl class="site-logistics-grid">
                 <div>
-                  <strong>2번 조립 출입문</strong>
-                  <span>B-DOOR-02</span>
+                  <dt>상·하차</dt>
+                  <dd id="site-logistics-handling">-</dd>
                 </div>
 
-                <strong data-door-status>
-                  폐쇄
-                </strong>
-              </div>
-
-              <div
-                class="door-progress"
-                aria-hidden="true"
-              >
-                <i data-door-progress></i>
-              </div>
-
-              <button
-                type="button"
-                data-door-toggle
-                data-door-id="B-DOOR-02"
-              >
-                출입문 개방
-              </button>
-            </section>
-
-            <section
-              class="door-control-item"
-              data-door-card="B-DOOR-03"
-              data-status="closed"
-            >
-              <div class="door-control-meta">
                 <div>
-                  <strong>3번 조립 출입문</strong>
-                  <span>B-DOOR-03</span>
+                  <dt>구내 운행</dt>
+                  <dd id="site-logistics-moving">-</dd>
                 </div>
 
-                <strong data-door-status>
-                  폐쇄
-                </strong>
-              </div>
-
-              <div
-                class="door-progress"
-                aria-hidden="true"
-              >
-                <i data-door-progress></i>
-              </div>
-
-              <button
-                type="button"
-                data-door-toggle
-                data-door-id="B-DOOR-03"
-              >
-                출입문 개방
-              </button>
+                <div>
+                  <dt>사용 도크</dt>
+                  <dd id="site-logistics-docks">-</dd>
+                </div>
+              </dl>
             </section>
-          </div>
 
-          <small>
-            각 버튼 또는 3D 출입문을 직접 클릭할 수 있습니다.
-          </small>
-        </aside>
+            <section class="site-section site-alert-section">
+              <div class="site-section-head">
+                <span>ALERT</span>
+                <h3>경고 설비</h3>
+                <strong id="site-alert-count">0건</strong>
+              </div>
 
-        <!-- 물류센터 상하차 도크 셔터 제어 -->
-        <aside
-          id="logistics-door-panel"
-          class="door-control-panel logistics-door-panel"
-          aria-label="물류센터 상하차 도크 셔터 제어"
-          hidden
-        >
-          <p>DOCK CONTROL</p>
-          <h2>물류센터 도크 셔터</h2>
+              <ul
+                id="site-alert-list"
+                class="site-alert-list"
+              ></ul>
+            </section>
+          </aside>
 
-          <div
-            class="door-control-list"
-            data-logistics-door-list
-          ></div>
-
-          <small>
-            각 버튼 또는 3D 셔터를 직접 클릭할 수 있습니다.
-          </small>
-        </aside>
-
-        <!-- 그래픽 품질 설정 -->
-        <aside
-          id="graphics-panel"
-          class="graphics-panel"
-          aria-label="그래픽 품질 설정"
-        >
-          <button
-            id="graphics-toggle-button"
-            class="graphics-toggle-button"
-            type="button"
-            aria-expanded="false"
-            aria-controls="graphics-options"
-          >
-            <span>
-              <small>GRAPHICS</small>
-              <strong>그래픽 품질</strong>
-            </span>
-
-            <b id="graphics-quality-value">자동</b>
-          </button>
-
-          <div
-            id="graphics-options"
-            class="graphics-options"
+          <!-- A동 출입문 제어 -->
+          <aside
+            id="factory-door-panel"
+            class="door-control-panel"
+            aria-label="A동 산업용 출입문 제어"
             hidden
           >
+            <p>DOOR CONTROL</p>
+            <h2>A동 산업용 출입문</h2>
+
+            <div class="door-control-list">
+              <section
+                class="door-control-item"
+                data-door-card="A-DOOR-01"
+                data-status="closed"
+              >
+                <div class="door-control-meta">
+                  <div>
+                    <strong>1번 출입문</strong>
+                    <span>A-DOOR-01</span>
+                  </div>
+
+                  <strong data-door-status>
+                    폐쇄
+                  </strong>
+                </div>
+
+                <div
+                  class="door-progress"
+                  aria-hidden="true"
+                >
+                  <i data-door-progress></i>
+                </div>
+
+                <button
+                  type="button"
+                  data-door-toggle
+                  data-door-id="A-DOOR-01"
+                >
+                  출입문 개방
+                </button>
+              </section>
+
+              <section
+                class="door-control-item"
+                data-door-card="A-DOOR-02"
+                data-status="closed"
+              >
+                <div class="door-control-meta">
+                  <div>
+                    <strong>2번 출입문</strong>
+                    <span>A-DOOR-02</span>
+                  </div>
+
+                  <strong data-door-status>
+                    폐쇄
+                  </strong>
+                </div>
+
+                <div
+                  class="door-progress"
+                  aria-hidden="true"
+                >
+                  <i data-door-progress></i>
+                </div>
+
+                <button
+                  type="button"
+                  data-door-toggle
+                  data-door-id="A-DOOR-02"
+                >
+                  출입문 개방
+                </button>
+              </section>
+            </div>
+
+            <small>
+              3D 출입문을 직접 클릭해도 작동합니다.
+            </small>
+          </aside>
+
+          <!-- B동 출입문 제어 -->
+          <aside
+            id="factory-b-door-panel"
+            class="door-control-panel factory-b-door-panel"
+            aria-label="B동 조립 출입문 제어"
+            hidden
+          >
+            <p>DOOR CONTROL</p>
+            <h2>B동 조립 출입문</h2>
+
+            <div class="door-control-list">
+              <section
+                class="door-control-item"
+                data-door-card="B-DOOR-01"
+                data-status="closed"
+              >
+                <div class="door-control-meta">
+                  <div>
+                    <strong>1번 조립 출입문</strong>
+                    <span>B-DOOR-01</span>
+                  </div>
+
+                  <strong data-door-status>
+                    폐쇄
+                  </strong>
+                </div>
+
+                <div
+                  class="door-progress"
+                  aria-hidden="true"
+                >
+                  <i data-door-progress></i>
+                </div>
+
+                <button
+                  type="button"
+                  data-door-toggle
+                  data-door-id="B-DOOR-01"
+                >
+                  출입문 개방
+                </button>
+              </section>
+
+              <section
+                class="door-control-item"
+                data-door-card="B-DOOR-02"
+                data-status="closed"
+              >
+                <div class="door-control-meta">
+                  <div>
+                    <strong>2번 조립 출입문</strong>
+                    <span>B-DOOR-02</span>
+                  </div>
+
+                  <strong data-door-status>
+                    폐쇄
+                  </strong>
+                </div>
+
+                <div
+                  class="door-progress"
+                  aria-hidden="true"
+                >
+                  <i data-door-progress></i>
+                </div>
+
+                <button
+                  type="button"
+                  data-door-toggle
+                  data-door-id="B-DOOR-02"
+                >
+                  출입문 개방
+                </button>
+              </section>
+
+              <section
+                class="door-control-item"
+                data-door-card="B-DOOR-03"
+                data-status="closed"
+              >
+                <div class="door-control-meta">
+                  <div>
+                    <strong>3번 조립 출입문</strong>
+                    <span>B-DOOR-03</span>
+                  </div>
+
+                  <strong data-door-status>
+                    폐쇄
+                  </strong>
+                </div>
+
+                <div
+                  class="door-progress"
+                  aria-hidden="true"
+                >
+                  <i data-door-progress></i>
+                </div>
+
+                <button
+                  type="button"
+                  data-door-toggle
+                  data-door-id="B-DOOR-03"
+                >
+                  출입문 개방
+                </button>
+              </section>
+            </div>
+
+            <small>
+              각 버튼 또는 3D 출입문을 직접 클릭할 수 있습니다.
+            </small>
+          </aside>
+
+          <!-- 물류센터 상하차 도크 셔터 제어 -->
+          <aside
+            id="logistics-door-panel"
+            class="door-control-panel logistics-door-panel"
+            aria-label="물류센터 상하차 도크 셔터 제어"
+            hidden
+          >
+            <p>DOCK CONTROL</p>
+            <h2>물류센터 도크 셔터</h2>
+
+            <div
+              class="door-control-list"
+              data-logistics-door-list
+            ></div>
+
+            <small>
+              각 버튼 또는 3D 셔터를 직접 클릭할 수 있습니다.
+            </small>
+          </aside>
+        </div>
+
+        <!-- 상단 그래픽 설정 버튼 -->
+        <button
+          id="graphics-toggle-button"
+          class="graphics-settings-button"
+          type="button"
+          aria-expanded="false"
+          aria-haspopup="dialog"
+          aria-controls="graphics-settings-modal"
+        >
+          <span class="graphics-settings-icon" aria-hidden="true">⚙</span>
+          <span class="graphics-settings-button-copy">
+            <small>SETTINGS</small>
+            <strong>그래픽</strong>
+          </span>
+          <b id="graphics-quality-value">자동</b>
+        </button>
+
+        <!-- 그래픽 품질 설정 모달 -->
+        <div
+          id="graphics-settings-modal"
+          class="graphics-settings-modal"
+          hidden
+        >
+          <section
+            class="graphics-settings-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="graphics-settings-title"
+            aria-describedby="graphics-settings-description"
+          >
+            <header class="graphics-settings-header">
+              <div>
+                <small>DISPLAY SETTINGS</small>
+                <h2 id="graphics-settings-title">그래픽 품질</h2>
+                <p id="graphics-settings-description">
+                  화면 품질과 성능에 맞는 렌더링 설정을 선택하세요.
+                </p>
+              </div>
+
+              <button
+                class="graphics-settings-close"
+                type="button"
+                data-graphics-close
+                aria-label="그래픽 설정 닫기"
+              >
+                ×
+              </button>
+            </header>
+
+            <div id="graphics-options" class="graphics-options">
             <button
               type="button"
               data-graphics-quality="auto"
               aria-pressed="true"
             >
               <strong>자동</strong>
-              <small>기기 성능에 맞춤</small>
+              <small>기기 성능에 맞춰 자동 선택</small>
             </button>
 
             <button
@@ -819,7 +787,7 @@
               aria-pressed="false"
             >
               <strong>낮음</strong>
-              <small>그림자 끄기</small>
+              <small>그림자를 끄고 성능 우선</small>
             </button>
 
             <button
@@ -828,7 +796,7 @@
               aria-pressed="false"
             >
               <strong>중간</strong>
-              <small>균형 설정</small>
+              <small>화질과 성능의 균형 설정</small>
             </button>
 
             <button
@@ -837,10 +805,16 @@
               aria-pressed="false"
             >
               <strong>높음</strong>
-              <small>고해상도 그림자</small>
+              <small>고해상도와 고품질 그림자</small>
             </button>
           </div>
-        </aside>
+
+            <footer class="graphics-settings-footer">
+              <span>선택한 품질은 이 브라우저에 자동 저장됩니다.</span>
+              <button type="button" data-graphics-close>완료</button>
+            </footer>
+          </section>
+        </div>
 
         <!-- 구역 범례 -->
         <aside
@@ -863,6 +837,10 @@
 
           <span class="logistics">
             물류·출하
+          </span>
+
+          <span class="office">
+            통합운영동
           </span>
         </aside>
 

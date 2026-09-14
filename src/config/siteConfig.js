@@ -1,9 +1,31 @@
+/*
+ * 부지 치수.
+ *
+ * 구역이 원점 대칭이 아니라 북쪽(사무동)으로 더 뻗어 있어
+ * 부지도 정사각형이 아니다. centerZ 는 부지 사각형의 중심이
+ * 원점에서 얼마나 북쪽에 있는지를 나타낸다.
+ *
+ *   구역 경계  z -548 ~ 400
+ *   부지 경계  z -600 ~ 452  (centerZ -74, depth 1052)
+ *
+ * 이렇게 두면 구역 끝과 순환도로 사이 여백이 사방 모두
+ * 4~12 로 비슷해져 남쪽에 빈 땅이 남지 않는다.
+ */
 export const SITE = Object.freeze({
   width: 1240,
-  depth: 900,
+  depth: 1052,
+  centerZ: -74,
   worldWidth: 2200,
-  worldDepth: 1700,
+  worldDepth: 2000,
   roadWidth: 32,
+
+  /*
+   * 외곽 순환도로 바깥선의 모서리 반경.
+   * 중심선 반경이 48 - 16 = 32 가 되어
+   * 트럭 경로의 회전 반경(LOGISTICS_CAMPUS_LOOP.cornerRadius)과 맞는다.
+   */
+  roadCornerRadius: 48,
+
   plotWidth: 520,
   plotDepth: 360,
 });
@@ -47,6 +69,16 @@ export const SITE_ZONES = Object.freeze([
     color: 0xe5b875,
     accent: "#c27d2f",
     opacity: 0.2,
+    showLabel: false,
+  },
+  {
+    id: "office",
+    label: "통합운영 사무동 구역",
+    position: [260, -478],
+    size: [520, 140],
+    color: 0x9aadb8,
+    accent: "#496e7d",
+    opacity: 0.18,
     showLabel: false,
   },
 ]);

@@ -74,9 +74,9 @@ export function createGraphicsQualityController({
   renderer,
   sunlight,
   resize,
-  panel,
+  modal,
   toggleButton,
-  optionsElement,
+  closeButtons,
   valueElement,
   qualityButtons,
 }) {
@@ -187,12 +187,33 @@ export function createGraphicsQualityController({
     applyQuality(event.currentTarget.dataset.graphicsQuality);
   }
 
-  function handleToggleClick() {
-    const willOpen = optionsElement.hidden;
+  function open() {
+    modal.hidden = false;
+    toggleButton.setAttribute("aria-expanded", "true");
+    closeButtons[0]?.focus();
+  }
 
-    optionsElement.hidden = !willOpen;
-    panel.classList.toggle("open", willOpen);
-    toggleButton.setAttribute("aria-expanded", String(willOpen));
+  function close() {
+    if (modal.hidden) return;
+
+    modal.hidden = true;
+    toggleButton.setAttribute("aria-expanded", "false");
+    toggleButton.focus();
+  }
+
+  function handleToggleClick() {
+    if (modal.hidden) {
+      open();
+      return;
+    }
+
+    close();
+  }
+
+  function handleBackdropClick(event) {
+    if (event.target === modal) {
+      close();
+    }
   }
 
   qualityButtons.forEach((button) => {
@@ -200,9 +221,17 @@ export function createGraphicsQualityController({
   });
 
   toggleButton.addEventListener("click", handleToggleClick);
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", close);
+  });
+  modal.addEventListener("click", handleBackdropClick);
   applyQuality(selectedQuality);
 
   return {
+    open,
+    close,
+    isOpen: () => !modal.hidden,
+
     setOverviewMode(value) {
       isOverviewMode = value;
       updateFog();
@@ -226,6 +255,10 @@ export function createGraphicsQualityController({
       });
 
       toggleButton.removeEventListener("click", handleToggleClick);
+      closeButtons.forEach((button) => {
+        button.removeEventListener("click", close);
+      });
+      modal.removeEventListener("click", handleBackdropClick);
     },
   };
 }
