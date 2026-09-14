@@ -94,6 +94,19 @@ export function createFactoryDoorController({
     emitChange();
   }
 
+  /*
+   * 자동 제어용 문 개폐.
+   *
+   * 사용자 클릭과 달리 enabled와 무관하게 동작한다.
+   * 다른 시점을 보고 있어도 설비는 계속 돌아가기 때문이다.
+   * 이미 같은 상태면 아무것도 하지 않는다.
+   */
+  function setDoorOpenState(door, open) {
+    if (!door || door.targetOpen === open) return;
+    door.targetOpen = open;
+    emitChange();
+  }
+
   function handlePointerDown(event) {
     if (!enabled || event.button !== 0 || activePointerId !== null) return;
 
@@ -166,6 +179,11 @@ export function createFactoryDoorController({
     toggleDoor(doorId) {
       const door = doors.find((item) => item.id === doorId);
       toggleDoorState(door);
+    },
+
+    setDoorOpen(doorId, open) {
+      const door = doors.find((item) => item.id === doorId);
+      setDoorOpenState(door, Boolean(open));
     },
 
     update(deltaSeconds) {

@@ -39,6 +39,12 @@ export const LOGISTICS_DOCK_X = Object.freeze([
 const perimeterInset = SITE.roadWidth / 2 + 16;
 const loopRoadX = SITE.width / 2 - perimeterInset;
 const loopRoadZ = SITE.depth / 2 - perimeterInset;
+
+/*
+ * 부지 사각형이 원점 대칭이 아니므로 남·북 도로는
+ * 부지 중심(centerZ)을 기준으로 놓인다.
+ */
+const siteCenterZ = SITE.centerZ ?? 0;
 const logisticsCenterX = LOGISTICS_CENTER.position[0];
 const logisticsCenterZ = LOGISTICS_CENTER.position[2];
 
@@ -51,13 +57,26 @@ const standbyLaneOffset = SITE.roadWidth / 4;
 export const LOGISTICS_CAMPUS_LOOP = Object.freeze({
   eastX: loopRoadX - logisticsCenterX,
   westX: -loopRoadX - logisticsCenterX,
-  northZ: -loopRoadZ - logisticsCenterZ,
-  southZ: loopRoadZ - logisticsCenterZ,
+  northZ: siteCenterZ - loopRoadZ - logisticsCenterZ,
+  southZ: siteCenterZ + loopRoadZ - logisticsCenterZ,
 
   /*
    * 외곽도로 모서리와 출차 합류부에서 사용할 회전 반경.
    */
   cornerRadius: 32,
+
+  /*
+   * 진출입로 포장을 도로 경계선까지만 깔기 위한 값.
+   */
+  roadHalfWidth: SITE.roadWidth / 2,
+
+  /*
+   * 순환도로 안쪽 선의 모서리 반경.
+   * 야드 포장의 바깥 모서리를 이 값으로 깎으면
+   * 도로 안쪽 곡선과 정확히 맞물려 틈이 생기지 않는다.
+   */
+  roadInnerCornerRadius:
+    SITE.roadCornerRadius - SITE.roadWidth,
 
   /*
    * 긴 외곽 순환 구간은 야드보다 조금 빠르게 주행한다.

@@ -597,40 +597,83 @@ function createModelTruck({
   return truck;
 }
 
+/*
+ * 물류센터 앞 포장 전체.
+ *
+ * 건물 앞면부터 외곽 순환도로 경계선까지를 한 장으로 깐다.
+ * 야드와 진출입로를 따로 두면 사이에 포장되지 않은 띠가 남고,
+ * 도로 위까지 덮으면 색이 다른 사각형이 도로에 얹혀 보인다.
+ *
+ * 곡선을 주는 모서리는 남동쪽 하나뿐이다.
+ * 거기서만 순환도로가 곡선으로 돌기 때문이다.
+ * 호의 중심과 반경을 도로 안쪽 곡선과 똑같이 잡아 두 곡선이
+ * 그대로 이어지게 한다. 값이 다르면 사이에 초승달 모양이 남는다.
+ *
+ * 남서(중앙도로) · 북동(동측도로) 모서리는 도로와 직각으로
+ * 만나므로 각지게 둔다. 여기에 곡선을 주면 도로 사이에 틈이 생긴다.
+ */
+function createYardPaving({
+  name,
+  material,
+  xRange,
+  zRange,
+  corner = 16,
+}) {
+  const [xMin, xMax] = xRange;
+  const [zMin, zMax] = zRange;
+  const shape = new THREE.Shape();
+
+  /*
+   * 평면을 눕히면 셰이프의 y축이 -z가 된다.
+   */
+  const y = (z) => -z;
+
+  shape.moveTo(xMin, y(zMin));
+  shape.lineTo(xMin, y(zMax));
+  shape.lineTo(xMax - corner, y(zMax));
+  shape.absarc(
+    xMax - corner,
+    y(zMax - corner),
+    corner,
+    -Math.PI / 2,
+    0,
+  );
+  shape.lineTo(xMax, y(zMin));
+  shape.closePath();
+
+  const mesh = new THREE.Mesh(
+    new THREE.ShapeGeometry(shape, 16),
+    material,
+  );
+
+  mesh.name = name;
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = 0.96;
+  mesh.receiveShadow = true;
+
+  return mesh;
+}
+
 function addTruckYard(
   group,
   materials,
   truckModels,
 ) {
   group.add(
-    createBox({
+    createYardPaving({
       name: "logistics-truck-yard",
-      size: [450, 0.12, 104],
-      position: [0, 0.9, 104],
       material: materials.yard,
-      castShadow: false,
-    }),
-    createBox({
-      name: "logistics-entry-connector-road",
-      size: [58, 0.13, 94],
-      position: [
-        LOGISTICS_YARD.entryGateX + 11,
-        0.9,
-        188,
+      xRange: [
+        LOGISTICS_YARD.entryGateX - 18,
+        LOGISTICS_CAMPUS_LOOP.eastX -
+          LOGISTICS_CAMPUS_LOOP.roadHalfWidth,
       ],
-      material: materials.yard,
-      castShadow: false,
-    }),
-    createBox({
-      name: "logistics-exit-connector-road",
-      size: [104, 0.13, 78],
-      position: [
-        (225 + LOGISTICS_CAMPUS_LOOP.eastX) / 2,
-        0.9,
-        184,
+      zRange: [
+        52,
+        LOGISTICS_CAMPUS_LOOP.southZ -
+          LOGISTICS_CAMPUS_LOOP.roadHalfWidth,
       ],
-      material: materials.yard,
-      castShadow: false,
+      corner: LOGISTICS_CAMPUS_LOOP.roadInnerCornerRadius,
     }),
   );
 

@@ -39,3 +39,15 @@ export const LOGISTICS_CENTER = Object.freeze({
   rotationY: 0,
   footprint: [480, 300],
 });
+
+export const CAMPUS_OFFICE = Object.freeze({
+  id: "campus-office",
+  name: "스마트캠퍼스 통합운영동",
+  code: "HQ-01",
+  position: [260, 0.08, -485],
+  rotationY: 0,
+  footprint: [300, 120],
+  towerFloors: 14,
+  floorHeight: 8,
+  podiumHeight: 18,
+});

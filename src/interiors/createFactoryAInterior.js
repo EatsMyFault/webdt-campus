@@ -108,12 +108,6 @@ function createMaterials() {
       roughness: 0.58,
       metalness: 0.38,
     }),
-    light: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0xeafcff,
-      emissiveIntensity: 3.2,
-      roughness: 0.2,
-    }),
   };
 }
 
@@ -614,20 +608,6 @@ function addFloorAndLighting(group, materials) {
       castShadow: false,
     }),
   );
-
-  [-160, -80, 0, 80, 160].forEach((x) => {
-    [-90, -30, 30, 90].forEach((z) => {
-      group.add(
-        createBox({
-          name: "factory-a-led-light",
-          size: [13, 0.22, 1.5],
-          position: [x, 38.5, z],
-          material: materials.light,
-          castShadow: false,
-        }),
-      );
-    });
-  });
 
   [-140, -45, 50, 145].forEach((x) => {
     [-60, 50].forEach((z) => {

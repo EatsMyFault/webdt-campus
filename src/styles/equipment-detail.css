@@ -489,31 +489,16 @@
     width: 180px;
   }
 
-  .site-panel {
+  .control-rail {
     top: 12px;
     right: 12px;
+    bottom: 12px;
     width: 190px;
-  }
-
-  .door-control-panel {
-    top: 198px;
-    right: 12px;
-    width: 190px;
-  }
-
-  .logistics-door-panel {
-    max-height: calc(100vh - 286px);
   }
 
   .legend-panel {
     bottom: 12px;
     left: 12px;
-  }
-
-  .graphics-panel {
-    right: 12px;
-    bottom: 12px;
-    width: 190px;
   }
 
   .equipment-detail-modal {

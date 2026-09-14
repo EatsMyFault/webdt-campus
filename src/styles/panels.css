@@ -1,18 +1,44 @@
 /*
- * 좌측 뷰포인트 패널 · 그래픽 품질 패널 · 하위 뷰 버튼
+ * 좌측 뷰포인트 패널 · 하위 뷰 버튼
+ * (그래픽 설정 버튼과 모달은 graphics-settings.css)
  */
 
 .site-panel,
 .viewpoint-panel,
 .door-control-panel,
-.graphics-panel,
 .legend-panel {
-  position: absolute;
   z-index: 10;
   border: 1px solid rgba(59, 117, 129, 0.2);
   background: rgba(250, 253, 252, 0.82);
   box-shadow: 0 14px 40px rgba(53, 89, 97, 0.12);
   backdrop-filter: blur(14px);
+}
+
+/*
+ * 우측 세로줄.
+ * 관제 패널과 출입문 패널이 이 안에서 높이를 나눠 갖는다.
+ * 레일 자체는 클릭을 받지 않아 빈 구간으로 3D 화면을 조작할 수 있다.
+ */
+.control-rail {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: var(--site-panel-width);
+  pointer-events: none;
+}
+
+.control-rail > * {
+  pointer-events: auto;
+}
+
+.viewpoint-panel,
+.legend-panel {
+  position: absolute;
 }
 
 .viewpoint-panel {
@@ -27,107 +53,9 @@
 
 .site-subviews[hidden],
 .door-control-panel[hidden],
-.graphics-options[hidden],
+.graphics-settings-modal[hidden],
 .equipment-detail-modal[hidden] {
   display: none;
-}
-
-.graphics-panel {
-  right: 24px;
-  bottom: 24px;
-  width: 248px;
-  overflow: hidden;
-  border-radius: 11px;
-}
-
-.graphics-toggle-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-  padding: 12px 14px;
-  color: #294c54;
-  text-align: left;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-}
-
-.graphics-toggle-button span,
-.graphics-toggle-button small,
-.graphics-toggle-button strong {
-  display: block;
-}
-
-.graphics-toggle-button small {
-  margin-bottom: 2px;
-  color: #419a8d;
-  font-size: 7px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-}
-
-.graphics-toggle-button strong {
-  font-size: 11px;
-}
-
-.graphics-toggle-button b {
-  color: #217f74;
-  font-size: 10px;
-}
-
-.graphics-toggle-button b::after {
-  display: inline-block;
-  margin-left: 7px;
-  content: "▴";
-  transform: rotate(180deg);
-  transition: transform 150ms ease;
-}
-
-.graphics-panel.open .graphics-toggle-button b::after {
-  transform: rotate(0deg);
-}
-
-.graphics-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  padding: 0 12px 12px;
-  border-top: 1px solid rgba(49, 107, 119, 0.12);
-}
-
-.graphics-options button {
-  min-width: 0;
-  margin-top: 9px;
-  padding: 8px;
-  color: #617b81;
-  text-align: left;
-  cursor: pointer;
-  background: rgba(239, 247, 245, 0.72);
-  border: 1px solid rgba(54, 111, 118, 0.14);
-  border-radius: 7px;
-}
-
-.graphics-options button strong,
-.graphics-options button small {
-  display: block;
-}
-
-.graphics-options button strong {
-  color: #33565e;
-  font-size: 9px;
-}
-
-.graphics-options button small {
-  margin-top: 2px;
-  font-size: 7px;
-}
-
-.graphics-options button.active {
-  background: rgba(222, 243, 238, 0.96);
-  border-color: #43a998;
-  box-shadow: 0 4px 12px rgba(44, 126, 118, 0.11);
 }
 
 .viewpoint-panel > p {
@@ -188,6 +116,10 @@
 
 .viewpoint-list button[data-viewpoint="logistics"]::before {
   background: #d38b3d;
+}
+
+.viewpoint-list button[data-viewpoint="office"]::before {
+  background: #496e7d;
 }
 
 .viewpoint-list button:hover {

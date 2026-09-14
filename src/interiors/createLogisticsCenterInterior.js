@@ -99,12 +99,6 @@ function createMaterials() {
       color: 0x1d272b,
       roughness: 0.92,
     }),
-    light: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0xe8fbff,
-      emissiveIntensity: 2.8,
-      roughness: 0.2,
-    }),
   };
 }
 
@@ -447,20 +441,6 @@ function addMaterialHandling(group, materials) {
 }
 
 function addLighting(group, materials) {
-  [-150, -75, 0, 75, 150].forEach((x) => {
-    [-92, -38, 16].forEach((z) => {
-      group.add(
-        createBox({
-          name: "logistics-interior-led-light",
-          size: [14, 0.25, 1.6],
-          position: [x, 37.5, z],
-          material: materials.light,
-          castShadow: false,
-        }),
-      );
-    });
-  });
-
   [-135, 0, 135].forEach((x) => {
     [-78, 0].forEach((z) => {
       const light = new THREE.PointLight(

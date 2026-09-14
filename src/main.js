@@ -7,6 +7,7 @@ import {
   FACTORY_B,
   UTILITY_CENTER,
   LOGISTICS_CENTER,
+  CAMPUS_OFFICE,
 } from "./config/buildingConfig.js";
 
 import {
@@ -58,6 +59,10 @@ import {
 } from "./buildings/createLogisticsCenter.js";
 
 import {
+  createCampusOffice,
+} from "./buildings/createCampusOffice.js";
+
+import {
   loadLogisticsTruckModels,
 } from "./buildings/loadLogisticsTruckModels.js";
 
@@ -70,12 +75,8 @@ import {
 } from "./animations/logisticsOperationController.js";
 
 import {
-  createScenarioEngine,
-} from "./simulation/scenarioEngine.js";
-
-import {
-  FACTORY_A_OVERHEAT_SCENARIO,
-} from "./simulation/scenarios/factoryAOverheatScenario.js";
+  createDockDoorAutomation,
+} from "./animations/dockDoorAutomation.js";
 
 import {
   createFactoryDoorController,
@@ -100,10 +101,6 @@ import {
 import {
   createCampusClock,
 } from "./ui/campusClock.js";
-
-import {
-  createScenarioPanel,
-} from "./ui/scenarioPanel.js";
 
 import {
   EQUIPMENT_DATA,
@@ -167,27 +164,34 @@ const sceneSystem = createScene(container);
 /*
  * 그래픽 품질 UI와 렌더링 옵션 연결
  */
-const graphicsPanel = document.querySelector(
-  "#graphics-panel",
+const graphicsSettingsModal = document.querySelector(
+  "#graphics-settings-modal",
 );
 
 const graphicsToggleButton = document.querySelector(
   "#graphics-toggle-button",
 );
 
-const graphicsOptions = document.querySelector(
-  "#graphics-options",
-);
-
 const graphicsQualityValue = document.querySelector(
   "#graphics-quality-value",
 );
+
+const graphicsCloseButtons = [
+  ...document.querySelectorAll(
+    "[data-graphics-close]",
+  ),
+];
 
 const graphicsQualityButtons = [
   ...document.querySelectorAll(
     "[data-graphics-quality]",
   ),
 ];
+
+const siteControlPanelElement =
+  document.querySelector(
+    "#site-control-panel",
+  );
 
 const graphicsQualityController =
   createGraphicsQualityController({
@@ -197,9 +201,9 @@ const graphicsQualityController =
     renderer: sceneSystem.renderer,
     sunlight: sceneSystem.sunlight,
     resize: sceneSystem.resize,
-    panel: graphicsPanel,
+    modal: graphicsSettingsModal,
     toggleButton: graphicsToggleButton,
-    optionsElement: graphicsOptions,
+    closeButtons: graphicsCloseButtons,
     valueElement: graphicsQualityValue,
     qualityButtons: graphicsQualityButtons,
   });
@@ -242,6 +246,11 @@ const logisticsCenter = createLogisticsCenter(
   site.group,
   LOGISTICS_CENTER,
   logisticsTruckModels,
+);
+
+createCampusOffice(
+  site.group,
+  CAMPUS_OFFICE,
 );
 
 /*
@@ -657,6 +666,17 @@ const logisticsDoorController =
 
 
 /*
+ * 트럭이 도크에 붙으면 그 셔터를 열고 출차하면 닫는다.
+ */
+const dockDoorAutomation =
+  createDockDoorAutomation({
+    operationController:
+      logisticsOperationController,
+    doorController: logisticsDoorController,
+  });
+
+
+/*
  * A동 제어 버튼 클릭
  */
 function handleFactoryADoorToggle(event) {
@@ -956,52 +976,6 @@ function moveToViewpoint(viewId) {
 
 
 /*
- * 첫 데모 시나리오: A동 CNC 과열 → 정지 → 복구.
- */
-const scenarioEngine = createScenarioEngine({
-  store: equipmentStore,
-  scenario: FACTORY_A_OVERHEAT_SCENARIO,
-
-  onStep({ step, scenario }) {
-    if (step.focusViewId) {
-      moveToViewpoint(step.focusViewId);
-    }
-
-    if (step.openDetail) {
-      const equipment =
-        equipmentStore.getEquipmentById(
-          scenario.targetEquipmentId,
-        );
-
-      if (equipment) {
-        selectedEquipmentFacilityId =
-          equipment.facilityId;
-        equipmentDetailPanel.open(equipment);
-      }
-    }
-  },
-
-  onReset({ scenario }) {
-    const equipment =
-      equipmentStore.getEquipmentById(
-        scenario.targetEquipmentId,
-      );
-
-    if (equipment) {
-      equipmentDetailPanel.refresh(equipment);
-    }
-  },
-});
-
-const scenarioPanel = createScenarioPanel({
-  root: document.querySelector(
-    "#scenario-panel",
-  ),
-  engine: scenarioEngine,
-});
-
-
-/*
  * 시점 버튼 클릭
  */
 function handleViewpointClick(event) {
@@ -1016,6 +990,10 @@ function handleViewpointClick(event) {
  * 숫자키 단축키
  */
 function handleViewpointShortcut(event) {
+  if (graphicsQualityController.isOpen()) {
+    return;
+  }
+
   /*
    * input이나 textarea를 입력 중일 때는
    * 숫자키 단축키를 실행하지 않는다.
@@ -1089,9 +1067,7 @@ window.addEventListener(
  */
 const siteControlPanel =
   createSiteControlPanel({
-    root: document.querySelector(
-      "#site-control-panel",
-    ),
+    root: siteControlPanelElement,
     equipment: equipmentStore.getAllEquipment(),
 
     getLiveStatus: (equipmentId) =>
@@ -1136,7 +1112,8 @@ const dragLookController =
 
     isBlocked: () =>
       cameraViewController.isTransitioning() ||
-      equipmentDetailPanel.isOpen(),
+      equipmentDetailPanel.isOpen() ||
+      graphicsQualityController.isOpen(),
 
     getViewMode: () =>
       cameraViewController.getActiveViewId() ?? "",
@@ -1160,7 +1137,8 @@ const keyboardMovement =
 
     isBlocked: () =>
       cameraViewController.isTransitioning() ||
-      equipmentDetailPanel.isOpen(),
+      equipmentDetailPanel.isOpen() ||
+      graphicsQualityController.isOpen(),
   });
 
 
@@ -1307,8 +1285,10 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
-  scenarioEngine.update(deltaSeconds);
-  scenarioPanel.update();
+  /*
+   * 갱신된 트럭 단계를 보고 도크 셔터를 여닫는다.
+   */
+  dockDoorAutomation.update();
 
   equipmentStatusVisualController.update(
     animationTime / 1000,
@@ -1426,12 +1406,12 @@ window.addEventListener(
     factoryDoorController.destroy();
     factoryBDoorController.destroy();
     logisticsDoorController.destroy();
+    dockDoorAutomation.destroy();
     equipmentSelectionController.destroy();
     equipmentDetailPanel.destroy();
     facilityLabelController.destroy();
     pipeFlowController.destroy();
     logisticsOperationController.destroy();
-    scenarioPanel.destroy();
     equipmentStatusVisualController.destroy();
     siteControlPanel.destroy();
     graphicsQualityController.destroy();

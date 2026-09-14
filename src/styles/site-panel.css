@@ -2,14 +2,16 @@
  * 우측 단지 통합 관제 패널 · 좌하단 범례
  */
 
+/*
+ * 출입문 패널이 쓰고 남은 높이를 모두 차지한다.
+ * 그 패널이 없는 전체·사무동 시점에서는 세로줄 전체를 쓴다.
+ */
 .site-panel {
-  top: 24px;
-  right: 24px;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 11px;
-  width: 268px;
-  max-height: var(--site-panel-height);
+  min-height: 0;
   padding: 16px;
   overflow-y: auto;
   border-radius: 12px;
@@ -473,4 +475,8 @@
 
 .legend-panel .logistics::before {
   background: #e5b875;
+}
+
+.legend-panel .office::before {
+  background: #9aadb8;
 }

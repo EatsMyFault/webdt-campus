@@ -11,11 +11,10 @@
   text-rendering: optimizeLegibility;
 
   /*
-   * 우측 세로줄 배분.
-   * 위쪽 관제 패널이 이 높이를 쓰고,
-   * 아래쪽 출입문 패널이 남은 높이를 쓴다.
+   * 우측 세로줄 폭.
+   * 높이 배분은 .control-rail 의 flex 가 맡는다.
    */
-  --site-panel-height: clamp(300px, calc(100vh - 340px), 560px);
+  --site-panel-width: 268px;
 }
 
 * {

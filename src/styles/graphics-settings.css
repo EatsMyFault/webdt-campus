@@ -1,0 +1,214 @@
+/*
+ * 그래픽 설정 버튼 · 품질 선택 모달
+ *
+ * 버튼은 우측 관제 패널 왼쪽 상단에 둔다.
+ * 관제 패널이 전체뷰에서 화면 아래까지 늘어나므로
+ * 예전처럼 우하단에 패널을 놓을 자리가 없다.
+ *
+ * 모달을 감추는 [hidden] 규칙은 다른 오버레이와 함께
+ * panels.css의 공용 목록에 있다.
+ */
+
+.graphics-settings-button {
+  position: absolute;
+  top: 24px;
+  right: calc(var(--site-panel-width) + 48px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  color: #294c54;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(250, 253, 252, 0.82);
+  border: 1px solid rgba(59, 117, 129, 0.2);
+  border-radius: 11px;
+  box-shadow: 0 14px 40px rgba(53, 89, 97, 0.12);
+  backdrop-filter: blur(14px);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.graphics-settings-button:hover,
+.graphics-settings-button[aria-expanded="true"] {
+  border-color: rgba(67, 169, 152, 0.6);
+  box-shadow: 0 14px 40px rgba(44, 126, 118, 0.2);
+}
+
+.graphics-settings-icon {
+  color: #43a998;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.graphics-settings-button-copy small,
+.graphics-settings-button-copy strong {
+  display: block;
+}
+
+.graphics-settings-button-copy small {
+  margin-bottom: 2px;
+  color: #419a8d;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.graphics-settings-button-copy strong {
+  font-size: 11px;
+}
+
+.graphics-settings-button b {
+  padding: 3px 8px;
+  color: #217f74;
+  font-size: 10px;
+  background: rgba(222, 243, 238, 0.9);
+  border-radius: 999px;
+}
+
+
+/*
+ * 품질 선택 모달
+ */
+
+.graphics-settings-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  padding: 34px;
+  background: rgba(25, 52, 60, 0.28);
+  backdrop-filter: blur(4px);
+  place-items: center;
+}
+
+.graphics-settings-dialog {
+  width: min(420px, calc(100vw - 68px));
+  max-height: calc(100vh - 68px);
+  overflow: auto;
+  padding: 20px;
+  color: #294b54;
+  background: rgba(248, 252, 251, 0.98);
+  border: 1px solid rgba(50, 111, 119, 0.24);
+  border-radius: 14px;
+  box-shadow: 0 26px 60px rgba(30, 62, 70, 0.26);
+}
+
+.graphics-settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.graphics-settings-header small {
+  display: block;
+  color: #419a8d;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.graphics-settings-header h2 {
+  margin: 5px 0 0;
+  font-size: 15px;
+}
+
+.graphics-settings-header p {
+  margin: 5px 0 0;
+  color: #62797f;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.graphics-settings-close {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  color: #5c757c;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  background: rgba(235, 243, 242, 0.9);
+  border: 1px solid rgba(54, 111, 118, 0.16);
+  border-radius: 8px;
+}
+
+.graphics-settings-close:hover {
+  color: #294b54;
+  background: rgba(222, 238, 236, 0.96);
+}
+
+.graphics-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.graphics-options button {
+  min-width: 0;
+  padding: 11px;
+  color: #617b81;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(239, 247, 245, 0.72);
+  border: 1px solid rgba(54, 111, 118, 0.14);
+  border-radius: 9px;
+}
+
+.graphics-options button:hover {
+  border-color: rgba(67, 169, 152, 0.45);
+}
+
+.graphics-options button strong,
+.graphics-options button small {
+  display: block;
+}
+
+.graphics-options button strong {
+  color: #33565e;
+  font-size: 11px;
+}
+
+.graphics-options button small {
+  margin-top: 3px;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.graphics-options button.active {
+  background: rgba(222, 243, 238, 0.96);
+  border-color: #43a998;
+  box-shadow: 0 4px 12px rgba(44, 126, 118, 0.11);
+}
+
+.graphics-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(49, 107, 119, 0.14);
+}
+
+.graphics-settings-footer span {
+  color: #6c8288;
+  font-size: 9px;
+}
+
+.graphics-settings-footer button {
+  padding: 8px 18px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #2f8f80;
+  border: 0;
+  border-radius: 8px;
+}
+
+.graphics-settings-footer button:hover {
+  background: #27796c;
+}
