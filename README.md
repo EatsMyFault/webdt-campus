@@ -53,6 +53,13 @@ Three.js와 Vite로 구현한 웹 기반 스마트 팩토리 단지 디지털 �
 - 설비 종류별 상세정보 UI 분기
 - 물류 운행 상태와 제어 패널
 
+### 데모 시나리오
+
+- A동 CNC 과열 → 경고 → 안전 정지 → 냉각 → 정상 복귀
+- 시나리오 재생, 일시정지, 초기화
+- 설비 상세정보, 관제 수량, 3D 상태등 동기화
+- 시간순 상태 변화 이벤트 기록
+
 ## 기술 스택
 
 - JavaScript ES Modules
@@ -89,6 +96,12 @@ npm.cmd run build
 npm.cmd run preview
 ```
 
+## 테스트
+
+```powershell
+npm.cmd test
+```
+
 ## A동 GLB 내보내기
 
 ```powershell
@@ -122,6 +135,7 @@ webdt-campus/
 │  ├─ interactions/           설비 선택과 출입문 제어
 │  ├─ interiors/              시설별 내부 설비와 생산라인
 │  ├─ scene/                  Three.js 장면, 카메라, 입력 제어
+│  ├─ simulation/             재사용 가능한 시나리오 엔진과 시나리오 정의
 │  ├─ styles/                 기능별 CSS 모듈
 │  ├─ ui/                     관제 패널, 라벨, 상세정보 UI
 │  ├─ main.js                 애플리케이션 구성과 모듈 연결
@@ -145,7 +159,7 @@ webdt-campus/
 
 ## 다음 개발 목표
 
-- 통합 설비 상태 Store와 Mock 실시간 데이터
+- 추가 고장·물류 시나리오
 - 실제 HTTP API 응답 형식 연결
 - WebSocket 기반 상태·온도·생산량 갱신
 - 생산 완료 데이터와 물류 출하 오더 연결

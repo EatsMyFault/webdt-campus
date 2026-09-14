@@ -465,6 +465,79 @@
           </section>
         </aside>
 
+        <!-- 데모 운전 시나리오 -->
+        <aside
+          id="scenario-panel"
+          class="scenario-panel"
+          data-state="idle"
+          aria-label="데모 운전 시나리오"
+        >
+          <header class="scenario-panel-head">
+            <div>
+              <p>DEMO SCENARIO</p>
+              <h2>A동 CNC 과열 대응</h2>
+            </div>
+
+            <span
+              id="scenario-state"
+              class="scenario-state"
+            >
+              대기
+            </span>
+          </header>
+
+          <div
+            class="scenario-progress"
+            role="progressbar"
+            aria-label="시나리오 진행률"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <i id="scenario-progress-fill"></i>
+          </div>
+
+          <div class="scenario-current">
+            <strong id="scenario-stage">
+              시나리오 준비
+            </strong>
+
+            <small id="scenario-time">
+              00:00 / 00:19
+            </small>
+          </div>
+
+          <div class="scenario-actions">
+            <button
+              type="button"
+              data-scenario-action="play"
+            >
+              시나리오 재생
+            </button>
+
+            <button
+              type="button"
+              data-scenario-action="pause"
+              disabled
+            >
+              일시정지
+            </button>
+
+            <button
+              type="button"
+              data-scenario-action="reset"
+              disabled
+            >
+              초기화
+            </button>
+          </div>
+
+          <ul
+            id="scenario-event-list"
+            class="scenario-event-list"
+            aria-live="polite"
+          ></ul>
+        </aside>
+
         <!-- A동 출입문 제어 -->
         <aside
           id="factory-door-panel"
