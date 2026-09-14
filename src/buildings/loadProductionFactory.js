@@ -1,7 +1,7 @@
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const DEFAULT_MODEL_URL = "/models/factory-a.glb";
+const DEFAULT_MODEL_URL = `${import.meta.env.BASE_URL}models/factory-a.glb`;
 
 function findMeshes(root) {
   const meshes = [];

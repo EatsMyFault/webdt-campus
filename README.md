@@ -128,6 +128,7 @@ webdt-campus/
 │  └─ style.css               CSS 진입점
 ├─ index.html
 ├─ package.json
+├─ vite.config.js              하위 경로 배포용 Vite 설정
 └─ README.md
 ```
 
