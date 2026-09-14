@@ -1,0 +1,1528 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="description"
+      content="밝은 주간 환경의 스마트 공장 단지 디지털트윈"
+    />
+
+    <title>Smart Factory Campus DT</title>
+  </head>
+
+  <body>
+    <main id="app">
+      <section
+        id="scene-container"
+        aria-label="스마트 공장 단지 3D 화면"
+      >
+        <!-- 빠른 시점 메뉴 -->
+        <nav
+          class="viewpoint-panel"
+          aria-label="단지 빠른 시점"
+        >
+          <p>QUICK VIEW</p>
+          <h2>단지 시점</h2>
+
+          <div class="viewpoint-list">
+            <!-- 단지 전체 -->
+            <button
+              type="button"
+              data-viewpoint="campus-overview"
+              aria-pressed="false"
+            >
+              <kbd>0</kbd>
+
+              <span>
+                <strong>단지 전체</strong>
+                <small>4개 구역 통합 전경</small>
+              </span>
+            </button>
+
+            <!-- 생산 A동 -->
+            <button
+              type="button"
+              data-viewpoint="factory-a"
+              aria-pressed="false"
+              aria-expanded="false"
+            >
+              <kbd>1</kbd>
+
+              <span>
+                <strong>생산 A동</strong>
+                <small>정밀가공 생산동</small>
+              </span>
+            </button>
+
+            <div
+              id="factory-a-subviews"
+              class="site-subviews factory-a-subviews"
+              aria-label="생산 A동 상세 시점"
+              hidden
+            >
+              <small>A동 상세 시점</small>
+
+              <button
+                type="button"
+                data-viewpoint="factory-a"
+                aria-pressed="false"
+              >
+                <b>01</b>
+
+                <span>
+                  <strong>건물 전경</strong>
+                  <small>외부 전체</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-a-entrance"
+                aria-pressed="false"
+              >
+                <b>02</b>
+
+                <span>
+                  <strong>산업용 출입구</strong>
+                  <small>도어 제어</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-a-interior"
+                aria-pressed="false"
+              >
+                <b>03</b>
+
+                <span>
+                  <strong>내부 생산라인</strong>
+                  <small>CNC 가공 셀</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-a-support"
+                aria-pressed="false"
+              >
+                <b>04</b>
+
+                <span>
+                  <strong>집진·공압 지원실</strong>
+                  <small>환경·압축공기 설비</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-a-2d"
+                aria-pressed="false"
+              >
+                <b>2D</b>
+
+                <span>
+                  <strong>설비 평면도</strong>
+                  <small>상부 설비 배치</small>
+                </span>
+              </button>
+            </div>
+
+            <!-- 생산 B동 -->
+            <button
+              type="button"
+              data-viewpoint="factory-b"
+              aria-pressed="false"
+              aria-expanded="false"
+            >
+              <kbd>2</kbd>
+
+              <span>
+                <strong>생산 B동</strong>
+                <small>스마트 자동조립</small>
+              </span>
+            </button>
+
+            <div
+              id="factory-b-subviews"
+              class="site-subviews factory-b-subviews"
+              aria-label="생산 B동 상세 시점"
+              hidden
+            >
+              <small>B동 상세 시점</small>
+
+              <button
+                type="button"
+                data-viewpoint="factory-b"
+                aria-pressed="false"
+              >
+                <b>01</b>
+
+                <span>
+                  <strong>건물 전경</strong>
+                  <small>외부 전체</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-b-entrance"
+                aria-pressed="false"
+              >
+                <b>02</b>
+
+                <span>
+                  <strong>조립동 출입구</strong>
+                  <small>전면 생산 출입문</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-b-interior"
+                aria-pressed="false"
+              >
+                <b>03</b>
+
+                <span>
+                  <strong>내부 자동조립</strong>
+                  <small>로봇 작업 셀</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="factory-b-2d"
+                aria-pressed="false"
+              >
+                <b>2D</b>
+
+                <span>
+                  <strong>설비 평면도</strong>
+                  <small>상부 조립라인 배치</small>
+                </span>
+              </button>
+            </div>
+
+            <!-- 유틸리티 -->
+            <button
+              type="button"
+              data-viewpoint="utility"
+              aria-pressed="false"
+              aria-expanded="false"
+            >
+              <kbd>3</kbd>
+
+              <span>
+                <strong>유틸리티</strong>
+                <small>전력·용수·냉각 공급</small>
+              </span>
+            </button>
+
+            <div
+              id="utility-subviews"
+              class="site-subviews utility-subviews"
+              aria-label="유틸리티 상세 시점"
+              hidden
+            >
+              <small>유틸리티 상세 시점</small>
+
+              <button
+                type="button"
+                data-viewpoint="utility"
+                aria-pressed="false"
+              >
+                <b>01</b>
+
+                <span>
+                  <strong>센터 전경</strong>
+                  <small>유틸리티 전체</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="utility-service"
+                aria-pressed="false"
+              >
+                <b>02</b>
+
+                <span>
+                  <strong>서비스동</strong>
+                  <small>내부 유틸리티 기계실</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="utility-equipment"
+                aria-pressed="false"
+              >
+                <b>03</b>
+
+                <span>
+                  <strong>옥외 설비 야드</strong>
+                  <small>탱크·냉각기·변압기</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="utility-2d"
+                aria-pressed="false"
+              >
+                <b>2D</b>
+
+                <span>
+                  <strong>계통 평면도</strong>
+                  <small>기계실·옥외 설비 배치</small>
+                </span>
+              </button>
+            </div>
+
+            <!-- 물류·출하 -->
+            <button
+              type="button"
+              data-viewpoint="logistics"
+              aria-pressed="false"
+              aria-expanded="false"
+            >
+              <kbd>4</kbd>
+
+              <span>
+                <strong>물류·출하</strong>
+                <small>입출고 물류센터</small>
+              </span>
+            </button>
+
+            <div
+              id="logistics-subviews"
+              class="site-subviews logistics-subviews"
+              aria-label="물류센터 상세 시점"
+              hidden
+            >
+              <small>물류센터 상세 시점</small>
+
+              <button
+                type="button"
+                data-viewpoint="logistics"
+                aria-pressed="false"
+              >
+                <b>01</b>
+
+                <span>
+                  <strong>건물 전경</strong>
+                  <small>물류센터 외부 전체</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="logistics-dock"
+                aria-pressed="false"
+              >
+                <b>02</b>
+
+                <span>
+                  <strong>상하차 도크</strong>
+                  <small>도크·트럭 대기장</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="logistics-interior"
+                aria-pressed="false"
+              >
+                <b>03</b>
+
+                <span>
+                  <strong>내부 물류 운영</strong>
+                  <small>랙·피킹·포장 구역</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-viewpoint="logistics-2d"
+                aria-pressed="false"
+              >
+                <b>2D</b>
+
+                <span>
+                  <strong>물류 평면도</strong>
+                  <small>입고·보관·출하 배치</small>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <small class="viewpoint-help">
+            버튼 또는 숫자키 0~4
+          </small>
+        </nav>
+
+        <!-- 단지 통합 관제 -->
+        <aside
+          id="site-control-panel"
+          class="site-panel"
+          aria-label="단지 통합 관제"
+        >
+          <header class="site-panel-head">
+            <div>
+              <p>SITE CONTROL</p>
+              <h2>단지 통합 관제</h2>
+            </div>
+
+            <small id="site-panel-updated">--:--:--</small>
+          </header>
+
+          <section class="site-summary">
+            <div class="site-summary-total">
+              <small>전체 설비</small>
+
+              <strong>
+                <span id="site-total-count">0</span><b>대</b>
+              </strong>
+            </div>
+
+            <ul class="site-status-grid">
+              <li data-status="running">
+                <span>정상</span>
+                <strong id="site-status-running">0</strong>
+              </li>
+
+              <li data-status="warning">
+                <span>경고</span>
+                <strong id="site-status-warning">0</strong>
+              </li>
+
+              <li data-status="idle">
+                <span>대기</span>
+                <strong id="site-status-idle">0</strong>
+              </li>
+
+              <li data-status="stopped">
+                <span>정지</span>
+                <strong id="site-status-stopped">0</strong>
+              </li>
+            </ul>
+          </section>
+
+          <section class="site-section">
+            <div class="site-section-head">
+              <span>UTILIZATION</span>
+              <h3>건물별 가동률</h3>
+            </div>
+
+            <ul
+              id="site-utilization-list"
+              class="site-utilization-list"
+            ></ul>
+          </section>
+
+          <section class="site-section">
+            <div class="site-section-head">
+              <span>LOGISTICS</span>
+              <h3>물류 작업 현황</h3>
+            </div>
+
+            <dl class="site-logistics-grid">
+              <div>
+                <dt>상·하차</dt>
+                <dd id="site-logistics-handling">-</dd>
+              </div>
+
+              <div>
+                <dt>구내 운행</dt>
+                <dd id="site-logistics-moving">-</dd>
+              </div>
+
+              <div>
+                <dt>사용 도크</dt>
+                <dd id="site-logistics-docks">-</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="site-section site-alert-section">
+            <div class="site-section-head">
+              <span>ALERT</span>
+              <h3>경고 설비</h3>
+              <strong id="site-alert-count">0건</strong>
+            </div>
+
+            <ul
+              id="site-alert-list"
+              class="site-alert-list"
+            ></ul>
+          </section>
+        </aside>
+
+        <!-- A동 출입문 제어 -->
+        <aside
+          id="factory-door-panel"
+          class="door-control-panel"
+          aria-label="A동 산업용 출입문 제어"
+          hidden
+        >
+          <p>DOOR CONTROL</p>
+          <h2>A동 산업용 출입문</h2>
+
+          <div class="door-control-list">
+            <section
+              class="door-control-item"
+              data-door-card="A-DOOR-01"
+              data-status="closed"
+            >
+              <div class="door-control-meta">
+                <div>
+                  <strong>1번 출입문</strong>
+                  <span>A-DOOR-01</span>
+                </div>
+
+                <strong data-door-status>
+                  폐쇄
+                </strong>
+              </div>
+
+              <div
+                class="door-progress"
+                aria-hidden="true"
+              >
+                <i data-door-progress></i>
+              </div>
+
+              <button
+                type="button"
+                data-door-toggle
+                data-door-id="A-DOOR-01"
+              >
+                출입문 개방
+              </button>
+            </section>
+
+            <section
+              class="door-control-item"
+              data-door-card="A-DOOR-02"
+              data-status="closed"
+            >
+              <div class="door-control-meta">
+                <div>
+                  <strong>2번 출입문</strong>
+                  <span>A-DOOR-02</span>
+                </div>
+
+                <strong data-door-status>
+                  폐쇄
+                </strong>
+              </div>
+
+              <div
+                class="door-progress"
+                aria-hidden="true"
+              >
+                <i data-door-progress></i>
+              </div>
+
+              <button
+                type="button"
+                data-door-toggle
+                data-door-id="A-DOOR-02"
+              >
+                출입문 개방
+              </button>
+            </section>
+          </div>
+
+          <small>
+            3D 출입문을 직접 클릭해도 작동합니다.
+          </small>
+        </aside>
+
+        <!-- B동 출입문 제어 -->
+        <aside
+          id="factory-b-door-panel"
+          class="door-control-panel factory-b-door-panel"
+          aria-label="B동 조립 출입문 제어"
+          hidden
+        >
+          <p>DOOR CONTROL</p>
+          <h2>B동 조립 출입문</h2>
+
+          <div class="door-control-list">
+            <section
+              class="door-control-item"
+              data-door-card="B-DOOR-01"
+              data-status="closed"
+            >
+              <div class="door-control-meta">
+                <div>
+                  <strong>1번 조립 출입문</strong>
+                  <span>B-DOOR-01</span>
+                </div>
+
+                <strong data-door-status>
+                  폐쇄
+                </strong>
+              </div>
+
+              <div
+                class="door-progress"
+                aria-hidden="true"
+              >
+                <i data-door-progress></i>
+              </div>
+
+              <button
+                type="button"
+                data-door-toggle
+                data-door-id="B-DOOR-01"
+              >
+                출입문 개방
+              </button>
+            </section>
+
+            <section
+              class="door-control-item"
+              data-door-card="B-DOOR-02"
+              data-status="closed"
+            >
+              <div class="door-control-meta">
+                <div>
+                  <strong>2번 조립 출입문</strong>
+                  <span>B-DOOR-02</span>
+                </div>
+
+                <strong data-door-status>
+                  폐쇄
+                </strong>
+              </div>
+
+              <div
+                class="door-progress"
+                aria-hidden="true"
+              >
+                <i data-door-progress></i>
+              </div>
+
+              <button
+                type="button"
+                data-door-toggle
+                data-door-id="B-DOOR-02"
+              >
+                출입문 개방
+              </button>
+            </section>
+
+            <section
+              class="door-control-item"
+              data-door-card="B-DOOR-03"
+              data-status="closed"
+            >
+              <div class="door-control-meta">
+                <div>
+                  <strong>3번 조립 출입문</strong>
+                  <span>B-DOOR-03</span>
+                </div>
+
+                <strong data-door-status>
+                  폐쇄
+                </strong>
+              </div>
+
+              <div
+                class="door-progress"
+                aria-hidden="true"
+              >
+                <i data-door-progress></i>
+              </div>
+
+              <button
+                type="button"
+                data-door-toggle
+                data-door-id="B-DOOR-03"
+              >
+                출입문 개방
+              </button>
+            </section>
+          </div>
+
+          <small>
+            각 버튼 또는 3D 출입문을 직접 클릭할 수 있습니다.
+          </small>
+        </aside>
+
+        <!-- 물류센터 상하차 도크 셔터 제어 -->
+        <aside
+          id="logistics-door-panel"
+          class="door-control-panel logistics-door-panel"
+          aria-label="물류센터 상하차 도크 셔터 제어"
+          hidden
+        >
+          <p>DOCK CONTROL</p>
+          <h2>물류센터 도크 셔터</h2>
+
+          <div
+            class="door-control-list"
+            data-logistics-door-list
+          ></div>
+
+          <small>
+            각 버튼 또는 3D 셔터를 직접 클릭할 수 있습니다.
+          </small>
+        </aside>
+
+        <!-- 그래픽 품질 설정 -->
+        <aside
+          id="graphics-panel"
+          class="graphics-panel"
+          aria-label="그래픽 품질 설정"
+        >
+          <button
+            id="graphics-toggle-button"
+            class="graphics-toggle-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="graphics-options"
+          >
+            <span>
+              <small>GRAPHICS</small>
+              <strong>그래픽 품질</strong>
+            </span>
+
+            <b id="graphics-quality-value">자동</b>
+          </button>
+
+          <div
+            id="graphics-options"
+            class="graphics-options"
+            hidden
+          >
+            <button
+              type="button"
+              data-graphics-quality="auto"
+              aria-pressed="true"
+            >
+              <strong>자동</strong>
+              <small>기기 성능에 맞춤</small>
+            </button>
+
+            <button
+              type="button"
+              data-graphics-quality="low"
+              aria-pressed="false"
+            >
+              <strong>낮음</strong>
+              <small>그림자 끄기</small>
+            </button>
+
+            <button
+              type="button"
+              data-graphics-quality="medium"
+              aria-pressed="false"
+            >
+              <strong>중간</strong>
+              <small>균형 설정</small>
+            </button>
+
+            <button
+              type="button"
+              data-graphics-quality="high"
+              aria-pressed="false"
+            >
+              <strong>높음</strong>
+              <small>고해상도 그림자</small>
+            </button>
+          </div>
+        </aside>
+
+        <!-- 구역 범례 -->
+        <aside
+          class="legend-panel"
+          aria-label="부지 구역 범례"
+        >
+          <strong>구역 범례</strong>
+
+          <span class="factory-a">
+            생산 A동
+          </span>
+
+          <span class="factory-b">
+            생산 B동
+          </span>
+
+          <span class="utility">
+            유틸리티
+          </span>
+
+          <span class="logistics">
+            물류·출하
+          </span>
+        </aside>
+
+        <!-- 설비 상세정보 모달 -->
+        <div
+          id="equipment-detail-modal"
+          class="equipment-detail-modal"
+          data-status="normal"
+          hidden
+        >
+          <article
+            class="equipment-detail-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="equipment-detail-name"
+          >
+            <header class="equipment-detail-header">
+              <div class="equipment-detail-heading">
+                <span
+                  id="equipment-detail-site"
+                  class="equipment-detail-eyebrow"
+                >
+                  A동 · 설비 상세정보
+                </span>
+
+                <div>
+                  <p id="equipment-detail-type">
+                    설비 유형
+                  </p>
+
+                  <h2 id="equipment-detail-name">
+                    설비 이름
+                  </h2>
+                </div>
+              </div>
+
+              <div class="equipment-detail-actions">
+                <span
+                  id="equipment-detail-status"
+                  class="equipment-status-badge"
+                >
+                  정상 가동
+                </span>
+
+                <button
+                  type="button"
+                  class="equipment-detail-close"
+                  data-equipment-detail-close
+                  aria-label="상세정보 닫기"
+                >
+                  ×
+                </button>
+              </div>
+            </header>
+
+            <div class="equipment-detail-body">
+              <!-- 기본정보 -->
+              <section class="equipment-identity-panel">
+                <div
+                  class="equipment-identity-icon"
+                  aria-hidden="true"
+                >
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </div>
+
+                <div>
+                  <dl class="equipment-identity-list">
+                    <div>
+                      <dt>설비 ID</dt>
+                      <dd id="equipment-detail-id">-</dd>
+                    </div>
+
+                    <div>
+                      <dt>설치 위치</dt>
+                      <dd id="equipment-detail-location">-</dd>
+                    </div>
+                  </dl>
+
+                  <p id="equipment-detail-description">
+                    -
+                  </p>
+                </div>
+              </section>
+
+              <!-- 센서 정보 -->
+              <section
+                class="equipment-detail-section equipment-sensor-section"
+              >
+                <div class="equipment-section-title">
+                  <div>
+                    <span>LIVE SENSOR</span>
+                    <h3>현재 운전 지표</h3>
+                  </div>
+
+                  <small>
+                    <i></i>
+                    더미 데이터
+                  </small>
+                </div>
+
+                <div
+                  id="equipment-detail-metrics"
+                  class="equipment-metric-grid"
+                ></div>
+              </section>
+
+              <!-- 온도 그래프 -->
+              <section
+                class="equipment-detail-section equipment-chart-section"
+              >
+                <div class="equipment-section-title">
+                  <div>
+                    <span>TREND</span>
+                    <h3>최근 온도 추이</h3>
+                  </div>
+
+                  <small id="equipment-chart-range">
+                    -
+                  </small>
+                </div>
+
+                <div
+                  class="equipment-chart"
+                  aria-label="최근 온도 변화 그래프"
+                >
+                  <svg
+                    viewBox="0 0 100 40"
+                    preserveAspectRatio="none"
+                    role="img"
+                  >
+                    <path
+                      class="equipment-chart-grid"
+                      d="M0 8H100 M0 20H100 M0 32H100"
+                    ></path>
+
+                    <polyline
+                      id="equipment-temperature-line"
+                      points=""
+                    ></polyline>
+                  </svg>
+                </div>
+              </section>
+
+              <!-- 생산 현황 -->
+              <section
+                class="equipment-detail-section equipment-production-section"
+              >
+                <div class="equipment-section-title">
+                  <div>
+                    <span>PRODUCTION</span>
+                    <h3>금일 생산 현황</h3>
+                  </div>
+
+                  <strong id="equipment-production-rate">
+                    0%
+                  </strong>
+                </div>
+
+                <dl class="equipment-production-grid">
+                  <div>
+                    <dt>작업지시</dt>
+                    <dd id="equipment-work-order">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>품목</dt>
+                    <dd id="equipment-product-name">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>생산 실적</dt>
+                    <dd id="equipment-production-count">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>사이클 타임</dt>
+                    <dd id="equipment-cycle-time">-</dd>
+                  </div>
+                </dl>
+
+                <div
+                  class="equipment-production-bar"
+                  aria-hidden="true"
+                >
+                  <i id="equipment-production-progress"></i>
+                </div>
+              </section>
+
+              <!-- 보전 정보 -->
+              <section
+                class="equipment-detail-section equipment-maintenance-section"
+              >
+                <div class="equipment-section-title">
+                  <div>
+                    <span>MAINTENANCE</span>
+                    <h3>보전 정보</h3>
+                  </div>
+                </div>
+
+                <dl class="equipment-maintenance-grid">
+                  <div>
+                    <dt>최근 점검</dt>
+                    <dd id="equipment-last-inspection">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>다음 점검</dt>
+                    <dd id="equipment-next-inspection">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>누적 가동</dt>
+                    <dd id="equipment-operating-hours">-</dd>
+                  </div>
+                </dl>
+
+                <p class="equipment-alert">
+                  <i></i>
+
+                  <span id="equipment-alert-message">
+                    -
+                  </span>
+                </p>
+              </section>
+            </div>
+
+            <footer class="equipment-detail-footer">
+              <span>
+                화면의 값은 UI 검증용 더미 데이터입니다.
+              </span>
+
+              <button
+                type="button"
+                data-equipment-detail-close
+              >
+                확인
+              </button>
+            </footer>
+          </article>
+
+          <!-- 유틸리티 설비 전용 관제 화면 -->
+          <article
+            id="utility-equipment-detail-card"
+            class="utility-equipment-detail-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="utility-detail-name"
+            hidden
+          >
+            <header class="utility-detail-header">
+              <div class="utility-detail-heading">
+                <span class="utility-detail-live">
+                  <i></i>
+                  LIVE UTILITY
+                </span>
+
+                <div>
+                  <p id="utility-detail-type">UTILITY ASSET</p>
+                  <h2 id="utility-detail-name">설비 이름</h2>
+                </div>
+              </div>
+
+              <div class="utility-detail-actions">
+                <span
+                  id="utility-detail-status"
+                  class="utility-detail-status"
+                >
+                  정상 가동
+                </span>
+
+                <button
+                  type="button"
+                  class="utility-detail-close"
+                  data-equipment-detail-close
+                  aria-label="유틸리티 상세정보 닫기"
+                >
+                  ×
+                </button>
+              </div>
+            </header>
+
+            <div class="utility-detail-body">
+              <section class="utility-overview-panel">
+                <div class="utility-asset-code">
+                  <span id="utility-detail-symbol">UT</span>
+                  <div>
+                    <small>ASSET ID</small>
+                    <strong id="utility-detail-id">-</strong>
+                  </div>
+                </div>
+
+                <div
+                  id="utility-detail-gauge"
+                  class="utility-supply-gauge"
+                >
+                  <div>
+                    <strong id="utility-detail-rate">0%</strong>
+                    <span id="utility-detail-rate-label">공급 달성률</span>
+                  </div>
+                </div>
+
+                <dl class="utility-identity-list">
+                  <div>
+                    <dt>설치 위치</dt>
+                    <dd id="utility-detail-location">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>현재 공급량</dt>
+                    <dd id="utility-detail-output">-</dd>
+                  </div>
+                </dl>
+
+                <p id="utility-detail-description">-</p>
+              </section>
+
+              <section class="utility-kpi-section">
+                <div class="utility-section-heading">
+                  <div>
+                    <span>REAL-TIME KPI</span>
+                    <h3>계통 운전 상태</h3>
+                  </div>
+
+                  <small>
+                    <i></i>
+                    모의 실시간 데이터
+                  </small>
+                </div>
+
+                <div
+                  id="utility-detail-metrics"
+                  class="utility-kpi-grid"
+                ></div>
+              </section>
+
+              <section class="utility-flow-section">
+                <div class="utility-section-heading">
+                  <div>
+                    <span>SYSTEM FLOW</span>
+                    <h3>공급 계통 흐름</h3>
+                  </div>
+                </div>
+
+                <div class="utility-flow-diagram">
+                  <div class="utility-flow-node">
+                    <small>SOURCE</small>
+                    <strong id="utility-flow-source">공급원</strong>
+                  </div>
+
+                  <div class="utility-flow-line">
+                    <i></i>
+                    <span>FLOW</span>
+                  </div>
+
+                  <div class="utility-flow-node active">
+                    <small>SELECTED ASSET</small>
+                    <strong id="utility-flow-equipment">선택 설비</strong>
+                  </div>
+
+                  <div class="utility-flow-line">
+                    <i></i>
+                    <span>SUPPLY</span>
+                  </div>
+
+                  <div class="utility-flow-node">
+                    <small>DESTINATION</small>
+                    <strong id="utility-flow-destination">공급 대상</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section class="utility-trend-section">
+                <div class="utility-section-heading">
+                  <div>
+                    <span>TEMPERATURE TREND</span>
+                    <h3 id="utility-detail-trend-title">최근 설비 온도</h3>
+                  </div>
+
+                  <small id="utility-detail-chart-range">-</small>
+                </div>
+
+                <div class="utility-trend-chart">
+                  <svg
+                    viewBox="0 0 100 44"
+                    preserveAspectRatio="none"
+                    role="img"
+                    aria-label="유틸리티 설비 온도 추이"
+                  >
+                    <path
+                      class="utility-chart-grid"
+                      d="M0 8H100 M0 20H100 M0 32H100 M20 0V44 M40 0V44 M60 0V44 M80 0V44"
+                    ></path>
+
+                    <polyline
+                      id="utility-detail-temperature-line"
+                      points=""
+                    ></polyline>
+                  </svg>
+                </div>
+              </section>
+
+              <section class="utility-operation-section">
+                <div class="utility-section-heading">
+                  <div>
+                    <span>OPERATION</span>
+                    <h3>운전 및 점검</h3>
+                  </div>
+                </div>
+
+                <dl class="utility-operation-grid">
+                  <div>
+                    <dt>운전 계획</dt>
+                    <dd id="utility-detail-work-order">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>공급 대상</dt>
+                    <dd id="utility-detail-product">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>운전 방식</dt>
+                    <dd id="utility-detail-cycle-time">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>최근 점검</dt>
+                    <dd id="utility-detail-last-inspection">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>다음 점검</dt>
+                    <dd id="utility-detail-next-inspection">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>누적 가동</dt>
+                    <dd id="utility-detail-operating-hours">-</dd>
+                  </div>
+                </dl>
+
+                <div class="utility-operation-progress">
+                  <span id="utility-detail-progress"></span>
+                </div>
+
+                <p class="utility-alert-message">
+                  <i></i>
+                  <span id="utility-detail-alert-message">-</span>
+                </p>
+              </section>
+            </div>
+
+            <footer class="utility-detail-footer">
+              <span>
+                UTILITY CONTROL CENTER · 마지막 갱신
+                <strong id="utility-detail-updated">--:--:--</strong>
+              </span>
+
+              <button
+                type="button"
+                data-equipment-detail-close
+              >
+                관제 화면 닫기
+              </button>
+            </footer>
+          </article>
+
+          <!-- 물류·출하 설비 전용 상세정보 -->
+          <article
+            id="logistics-equipment-detail-card"
+            class="logistics-equipment-detail-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logistics-detail-name"
+            hidden
+          >
+            <header class="logistics-detail-header">
+              <div class="logistics-detail-heading">
+                <span class="logistics-detail-live">
+                  <i></i>
+                  LIVE LOGISTICS
+                </span>
+
+                <div>
+                  <p id="logistics-detail-type">
+                    LOGISTICS ASSET
+                  </p>
+
+                  <h2 id="logistics-detail-name">
+                    물류 설비 이름
+                  </h2>
+                </div>
+              </div>
+
+              <div class="logistics-detail-actions">
+                <span
+                  id="logistics-detail-status"
+                  class="logistics-detail-status"
+                >
+                  작업 중
+                </span>
+
+                <button
+                  type="button"
+                  class="logistics-detail-close"
+                  data-equipment-detail-close
+                  aria-label="물류 상세정보 닫기"
+                >
+                  ×
+                </button>
+              </div>
+            </header>
+
+            <div class="logistics-detail-body">
+              <!-- 기본정보 -->
+              <section class="logistics-overview-panel">
+                <div class="logistics-asset-symbol">
+                  <span id="logistics-detail-symbol">
+                    LG
+                  </span>
+
+                  <div>
+                    <small>ASSET ID</small>
+                    <strong id="logistics-detail-id">-</strong>
+                  </div>
+                </div>
+
+                <dl class="logistics-identity-list">
+                  <div>
+                    <dt>현재 위치</dt>
+                    <dd id="logistics-detail-location">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>작업 단계</dt>
+                    <dd id="logistics-detail-stage">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>현재 좌표</dt>
+                    <dd id="logistics-detail-position">-</dd>
+                  </div>
+                </dl>
+
+                <p id="logistics-detail-description">
+                  -
+                </p>
+              </section>
+
+              <!-- 실시간 지표 -->
+              <section class="logistics-kpi-section">
+                <div class="logistics-section-heading">
+                  <div>
+                    <span>REAL-TIME KPI</span>
+                    <h3>현재 물류 작업 지표</h3>
+                  </div>
+
+                  <small id="logistics-detail-updated">
+                    --:--:--
+                  </small>
+                </div>
+
+                <div
+                  id="logistics-detail-metrics"
+                  class="logistics-kpi-grid"
+                ></div>
+              </section>
+
+              <!-- 작업 진행상태 -->
+              <section class="logistics-operation-section">
+                <div class="logistics-section-heading">
+                  <div>
+                    <span>OPERATION</span>
+                    <h3 id="logistics-operation-title">
+                      출하 작업 현황
+                    </h3>
+                  </div>
+
+                  <strong id="logistics-detail-progress-value">
+                    0%
+                  </strong>
+                </div>
+
+                <div class="logistics-progress-track">
+                  <i id="logistics-detail-progress"></i>
+                </div>
+
+                <dl class="logistics-operation-grid">
+                  <div>
+                    <dt>작업지시</dt>
+                    <dd id="logistics-detail-order">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>처리 품목</dt>
+                    <dd id="logistics-detail-cargo">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>처리 수량</dt>
+                    <dd id="logistics-detail-quantity">-</dd>
+                  </div>
+
+                  <div>
+                    <dt id="logistics-detail-cycle-label">
+                      출차 예정
+                    </dt>
+
+                    <dd id="logistics-detail-cycle">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>입차 시각</dt>
+                    <dd id="logistics-detail-arrival">-</dd>
+                  </div>
+
+                  <div>
+                    <dt>출차 시각</dt>
+                    <dd id="logistics-detail-departure">-</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <!-- 이동 경로 -->
+              <section class="logistics-route-section">
+                <div class="logistics-section-heading">
+                  <div>
+                    <span>ROUTE</span>
+                    <h3 id="logistics-route-title">
+                      운송 경로
+                    </h3>
+                  </div>
+                </div>
+
+                <div class="logistics-route">
+                  <article>
+                    <small id="logistics-route-source-label">
+                      출발지
+                    </small>
+
+                    <strong id="logistics-route-source">
+                      -
+                    </strong>
+                  </article>
+
+                  <div class="logistics-route-line">
+                    <i></i>
+                    <span>→</span>
+                    <i></i>
+                  </div>
+
+                  <article>
+                    <small id="logistics-route-destination-label">
+                      목적지
+                    </small>
+
+                    <strong id="logistics-route-destination">
+                      -
+                    </strong>
+                  </article>
+                </div>
+              </section>
+
+              <!-- 차량 또는 도크 배정정보 -->
+              <section class="logistics-assignment-section">
+                <div class="logistics-section-heading">
+                  <div>
+                    <span>ASSIGNMENT</span>
+
+                    <h3 id="logistics-assignment-title">
+                      차량 및 도크 배정
+                    </h3>
+                  </div>
+                </div>
+
+                <dl class="logistics-assignment-grid">
+                  <div>
+                    <dt id="logistics-assignment-label-1">
+                      차량번호
+                    </dt>
+
+                    <dd id="logistics-assignment-value-1">
+                      -
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt id="logistics-assignment-label-2">
+                      운송사
+                    </dt>
+
+                    <dd id="logistics-assignment-value-2">
+                      -
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt id="logistics-assignment-label-3">
+                      담당 기사
+                    </dt>
+
+                    <dd id="logistics-assignment-value-3">
+                      -
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt id="logistics-assignment-label-4">
+                      배정 도크
+                    </dt>
+
+                    <dd id="logistics-assignment-value-4">
+                      -
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+
+              <!-- 알림 -->
+              <section class="logistics-alert-section">
+                <div class="logistics-section-heading">
+                  <div>
+                    <span>ALERT</span>
+                    <h3>물류 작업 알림</h3>
+                  </div>
+                </div>
+
+                <p class="logistics-alert-message">
+                  <i></i>
+
+                  <span id="logistics-detail-alert-message">
+                    현재 감지된 이상이 없습니다.
+                  </span>
+                </p>
+              </section>
+            </div>
+
+            <footer class="logistics-detail-footer">
+              <span>
+                화면의 값은 물류 UI 검증용 더미 데이터입니다.
+              </span>
+
+              <button
+                type="button"
+                data-equipment-detail-close
+              >
+                확인
+              </button>
+            </footer>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script
+      type="module"
+      src="/src/main.js"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,664 @@
+/*
+ * 물류·출하 설비 상세정보
+ */
+.logistics-equipment-detail-card[hidden] {
+  display: none;
+}
+
+.equipment-detail-modal[data-detail-mode="logistics"] {
+  --logistics-accent: #d38a35;
+  --logistics-accent-rgb: 211, 138, 53;
+  --logistics-secondary: #319b89;
+  --logistics-text: #294b54;
+  --logistics-muted: #72878d;
+  --logistics-border: #d5e3e3;
+  --logistics-surface: #ffffff;
+  --logistics-surface-soft: #f2f7f6;
+}
+
+/* 트럭은 주황색, 도크는 청록색으로 구분 */
+.equipment-detail-modal[data-logistics-kind="dock"] {
+  --logistics-accent: #319b89;
+  --logistics-accent-rgb: 49, 155, 137;
+  --logistics-secondary: #d38a35;
+}
+
+.logistics-equipment-detail-card {
+  width: min(1180px, calc(100vw - 68px));
+  max-height: calc(100vh - 68px);
+  overflow: auto;
+  color: var(--logistics-text);
+  background:
+    radial-gradient(
+      circle at 8% 0%,
+      rgba(var(--logistics-accent-rgb), 0.1),
+      transparent 28%
+    ),
+    #f7fbfa;
+  border: 1px solid rgba(52, 101, 108, 0.24);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgba(31, 61, 68, 0.28);
+}
+
+/*
+ * 상단 제목 영역
+ */
+.logistics-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  background: rgba(250, 253, 252, 0.96);
+  border-bottom: 1px solid var(--logistics-border);
+  backdrop-filter: blur(12px);
+}
+
+.logistics-detail-heading {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.logistics-detail-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  color: var(--logistics-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  background: rgba(var(--logistics-accent-rgb), 0.1);
+  border: 1px solid rgba(var(--logistics-accent-rgb), 0.25);
+  border-radius: 999px;
+}
+
+.logistics-detail-live i {
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.logistics-detail-heading p {
+  margin: 0 0 4px;
+  color: var(--logistics-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.logistics-detail-heading h2 {
+  margin: 0;
+  color: var(--logistics-text);
+  font-size: 24px;
+}
+
+.logistics-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logistics-detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  color: #237d6c;
+  font-size: 12px;
+  font-weight: 900;
+  background: #e5f6f1;
+  border: 1px solid rgba(49, 155, 137, 0.28);
+  border-radius: 999px;
+}
+
+.logistics-detail-status::before {
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 7px currentColor;
+  content: "";
+}
+
+.equipment-detail-modal[data-status="warning"]
+.logistics-detail-status {
+  color: #9a6811;
+  background: #fff0d5;
+  border-color: rgba(211, 138, 53, 0.34);
+}
+
+.equipment-detail-modal[data-status="idle"]
+.logistics-detail-status {
+  color: #657980;
+  background: #e8eeee;
+  border-color: rgba(101, 121, 128, 0.28);
+}
+
+.equipment-detail-modal[data-status="stopped"]
+.logistics-detail-status {
+  color: #a04c4c;
+  background: #f9e2e2;
+  border-color: rgba(160, 76, 76, 0.28);
+}
+
+.logistics-detail-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #6e8389;
+  font-size: 24px;
+  cursor: pointer;
+  background: #edf3f2;
+  border: 1px solid var(--logistics-border);
+  border-radius: 9px;
+  place-items: center;
+}
+
+.logistics-detail-close:hover {
+  color: #ffffff;
+  background: var(--logistics-accent);
+  border-color: var(--logistics-accent);
+}
+
+/*
+ * 전체 내용 배치
+ */
+.logistics-detail-body {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.logistics-overview-panel,
+.logistics-kpi-section,
+.logistics-operation-section,
+.logistics-route-section,
+.logistics-assignment-section,
+.logistics-alert-section {
+  background: var(--logistics-surface);
+  border: 1px solid var(--logistics-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(39, 75, 84, 0.06);
+}
+
+.logistics-overview-panel {
+  grid-column: span 4;
+  padding: 18px;
+}
+
+.logistics-kpi-section {
+  grid-column: span 8;
+  padding: 18px;
+}
+
+.logistics-operation-section {
+  grid-column: span 7;
+  padding: 18px;
+}
+
+.logistics-route-section {
+  grid-column: span 5;
+  padding: 18px;
+}
+
+.logistics-assignment-section {
+  grid-column: span 7;
+  padding: 18px;
+}
+
+.logistics-alert-section {
+  grid-column: span 5;
+  padding: 18px;
+}
+
+/*
+ * 기본정보
+ */
+.logistics-asset-symbol {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 17px;
+}
+
+.logistics-asset-symbol > span {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  background:
+    linear-gradient(
+      145deg,
+      var(--logistics-accent),
+      var(--logistics-secondary)
+    );
+  border-radius: 13px;
+  box-shadow:
+    0 9px 18px rgba(var(--logistics-accent-rgb), 0.25);
+  place-items: center;
+}
+
+.logistics-asset-symbol div {
+  display: grid;
+  gap: 4px;
+}
+
+.logistics-asset-symbol small {
+  color: var(--logistics-muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.logistics-asset-symbol strong {
+  color: var(--logistics-text);
+  font-size: 17px;
+}
+
+.logistics-identity-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.logistics-identity-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e4eded;
+}
+
+.logistics-identity-list dt {
+  color: var(--logistics-muted);
+  font-size: 11px;
+}
+
+.logistics-identity-list dd {
+  margin: 0;
+  color: var(--logistics-text);
+  font-size: 12px;
+  font-weight: 850;
+  text-align: right;
+}
+
+.logistics-overview-panel > p {
+  margin: 0;
+  color: var(--logistics-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/*
+ * 공통 섹션 제목
+ */
+.logistics-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.logistics-section-heading span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--logistics-accent);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.logistics-section-heading h3 {
+  margin: 0;
+  color: var(--logistics-text);
+  font-size: 15px;
+}
+
+.logistics-section-heading > small {
+  color: var(--logistics-muted);
+  font-size: 10px;
+}
+
+.logistics-section-heading > strong {
+  color: var(--logistics-accent);
+  font-size: 22px;
+}
+
+/*
+ * 실시간 KPI
+ */
+.logistics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.logistics-kpi-card {
+  display: grid;
+  min-width: 0;
+  padding: 13px;
+  background: var(--logistics-surface-soft);
+  border: 1px solid #dfebea;
+  border-radius: 9px;
+}
+
+.logistics-kpi-card > small {
+  color: var(--logistics-accent);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.logistics-kpi-card > span {
+  margin: 13px 0 5px;
+  overflow: hidden;
+  color: var(--logistics-muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logistics-kpi-card strong {
+  overflow: hidden;
+  color: var(--logistics-text);
+  font-size: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logistics-kpi-card strong b {
+  margin-left: 4px;
+  color: var(--logistics-muted);
+  font-size: 9px;
+}
+
+.logistics-kpi-card.emphasis {
+  background: #fff5e5;
+  border-color: rgba(211, 138, 53, 0.4);
+}
+
+.logistics-kpi-card.emphasis strong {
+  color: #a9681c;
+}
+
+/*
+ * 작업 진행률
+ */
+.logistics-progress-track {
+  height: 9px;
+  margin-bottom: 17px;
+  overflow: hidden;
+  background: #e5eeed;
+  border-radius: 999px;
+}
+
+.logistics-progress-track i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      var(--logistics-accent),
+      var(--logistics-secondary)
+    );
+  border-radius: inherit;
+  transition: width 300ms ease;
+}
+
+.logistics-operation-grid,
+.logistics-assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.logistics-operation-grid div,
+.logistics-assignment-grid div {
+  padding: 10px 12px;
+  background: var(--logistics-surface-soft);
+  border-radius: 8px;
+}
+
+.logistics-operation-grid dt,
+.logistics-assignment-grid dt {
+  margin-bottom: 5px;
+  color: var(--logistics-muted);
+  font-size: 10px;
+}
+
+.logistics-operation-grid dd,
+.logistics-assignment-grid dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--logistics-text);
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * 운송 경로
+ */
+.logistics-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr);
+  align-items: center;
+  min-height: 112px;
+}
+
+.logistics-route article {
+  display: grid;
+  min-width: 0;
+  min-height: 76px;
+  padding: 12px;
+  background: var(--logistics-surface-soft);
+  border: 1px solid #dfe9e8;
+  border-radius: 9px;
+  place-content: center;
+  text-align: center;
+}
+
+.logistics-route article small {
+  margin-bottom: 7px;
+  color: var(--logistics-accent);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.logistics-route article strong {
+  color: var(--logistics-text);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.logistics-route-line {
+  display: flex;
+  align-items: center;
+  color: var(--logistics-accent);
+}
+
+.logistics-route-line i {
+  flex: 1;
+  height: 2px;
+  background: rgba(var(--logistics-accent-rgb), 0.35);
+}
+
+.logistics-route-line span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  background: rgba(var(--logistics-accent-rgb), 0.12);
+  border-radius: 50%;
+  place-items: center;
+}
+
+/*
+ * 경고 메시지
+ */
+.logistics-alert-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 74px;
+  margin: 0;
+  padding: 14px;
+  color: #347366;
+  font-size: 11px;
+  line-height: 1.6;
+  background: #eaf7f3;
+  border: 1px solid rgba(49, 155, 137, 0.22);
+  border-radius: 9px;
+}
+
+.logistics-alert-message i {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 4px;
+  background: #36b995;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #36b995;
+}
+
+.equipment-detail-modal[data-status="warning"]
+.logistics-alert-message {
+  color: #8c641f;
+  background: #fff6e6;
+  border-color: rgba(211, 138, 53, 0.35);
+}
+
+.equipment-detail-modal[data-status="warning"]
+.logistics-alert-message i {
+  background: #eda83a;
+  box-shadow: 0 0 8px #eda83a;
+}
+
+/*
+ * 하단
+ */
+.logistics-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  color: var(--logistics-muted);
+  font-size: 10px;
+  background: #eef5f3;
+  border-top: 1px solid var(--logistics-border);
+}
+
+.logistics-detail-footer button {
+  padding: 9px 19px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  background: var(--logistics-accent);
+  border: 0;
+  border-radius: 7px;
+}
+
+/*
+ * 작은 화면 대응
+ */
+@media (max-width: 1000px) {
+  .logistics-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .logistics-equipment-detail-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+  }
+
+  .logistics-detail-header {
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .logistics-detail-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .logistics-detail-body {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .logistics-overview-panel,
+  .logistics-kpi-section,
+  .logistics-operation-section,
+  .logistics-route-section,
+  .logistics-assignment-section,
+  .logistics-alert-section {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .logistics-detail-live {
+    display: none;
+  }
+
+  .logistics-detail-heading h2 {
+    font-size: 18px;
+  }
+
+  .logistics-detail-status {
+    display: none;
+  }
+
+  .logistics-kpi-grid,
+  .logistics-operation-grid,
+  .logistics-assignment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logistics-route {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .logistics-route-line {
+    justify-content: center;
+  }
+
+  .logistics-route-line i {
+    display: none;
+  }
+
+  .logistics-route-line span {
+    transform: rotate(90deg);
+  }
+
+  .logistics-detail-footer span {
+    display: none;
+  }
+
+  .logistics-detail-footer {
+    justify-content: flex-end;
+  }
+}

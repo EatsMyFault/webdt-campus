@@ -1,0 +1,66 @@
+/*
+ * 전역 기본값 · 리셋 · 3D 씬 레이어
+ */
+
+:root {
+  font-family:
+    Inter, Pretendard, "Noto Sans KR", system-ui, sans-serif;
+  color: #17343d;
+  background: #dcecf4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  /*
+   * 우측 세로줄 배분.
+   * 위쪽 관제 패널이 이 높이를 쓰고,
+   * 아래쪽 출입문 패널이 남은 높이를 쓴다.
+   */
+  --site-panel-height: clamp(300px, calc(100vh - 340px), 560px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+#scene-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #d8eaf4 0%, #edf5f4 72%, #dce7da 100%);
+}
+
+.webgl-canvas,
+.label-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.webgl-canvas {
+  z-index: 1;
+  display: block;
+  outline: none;
+}
+
+.label-layer {
+  z-index: 2;
+  pointer-events: none;
+}

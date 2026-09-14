@@ -1,0 +1,454 @@
+/*
+ * 우측 단지 통합 관제 패널 · 좌하단 범례
+ */
+
+.site-panel {
+  top: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 268px;
+  max-height: var(--site-panel-height);
+  padding: 16px;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+/*
+ * 패널 전체가 하나의 스크롤 영역이므로
+ * 안쪽 블록은 높이가 눌리지 않게 한다.
+ */
+.site-panel > * {
+  flex: none;
+}
+
+.site-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.site-panel-head > p {
+  margin: 0 0 3px;
+  color: #419a8d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.site-panel-head h2 {
+  margin: 0;
+  color: #193c46;
+  font-size: 16px;
+}
+
+.site-panel-head small {
+  color: #8ba0a4;
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+/*
+ * 전체 설비 수와 상태별 집계
+ */
+.site-summary {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.site-summary-total {
+  padding: 9px 10px;
+  background: rgba(226, 242, 238, 0.82);
+  border: 1px solid rgba(45, 138, 126, 0.2);
+  border-radius: 8px;
+}
+
+.site-summary-total small {
+  display: block;
+  color: #5d8a86;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.site-summary-total strong {
+  display: block;
+  margin-top: 3px;
+  color: #1d4a53;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.site-summary-total b {
+  margin-left: 3px;
+  color: #6f8b90;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.site-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-status-grid li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 5px 7px;
+  border-radius: 6px;
+}
+
+.site-status-grid span {
+  position: relative;
+  padding-left: 11px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.site-status-grid span::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.site-status-grid strong {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-status-grid [data-status="running"] {
+  color: #1f8a72;
+  background: rgba(37, 187, 145, 0.12);
+}
+
+.site-status-grid [data-status="running"] span::before {
+  background: #25bb91;
+}
+
+.site-status-grid [data-status="warning"] {
+  color: #9a6811;
+  background: rgba(238, 167, 47, 0.15);
+}
+
+.site-status-grid [data-status="warning"] span::before {
+  background: #eea72f;
+}
+
+.site-status-grid [data-status="idle"] {
+  color: #657980;
+  background: rgba(142, 161, 165, 0.16);
+}
+
+.site-status-grid [data-status="idle"] span::before {
+  background: #8ea1a5;
+}
+
+.site-status-grid [data-status="stopped"] {
+  color: #a04c4c;
+  background: rgba(223, 100, 100, 0.14);
+}
+
+.site-status-grid [data-status="stopped"] span::before {
+  background: #df6464;
+}
+
+/*
+ * 공통 구역 제목
+ */
+.site-section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 0;
+  padding-top: 11px;
+  border-top: 1px solid rgba(49, 107, 119, 0.14);
+}
+
+.site-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.site-section-head span {
+  color: #5fa79b;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.site-section-head h3 {
+  margin: 0;
+  color: #2b525b;
+  font-size: 11px;
+}
+
+.site-section-head > strong {
+  margin-left: auto;
+  color: #9a6811;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * 건물별 가동률
+ */
+.site-utilization-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-utilization-list > li {
+  display: grid;
+  gap: 4px;
+}
+
+.site-utilization-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.site-utilization-head strong {
+  position: relative;
+  padding-left: 10px;
+  color: #33565e;
+  font-size: 10px;
+}
+
+.site-utilization-head strong::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.site-utilization-head small {
+  color: #8ba0a4;
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-utilization-head em {
+  margin-left: auto;
+  color: #26535c;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-utilization-bar {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: rgba(56, 112, 122, 0.13);
+  border-radius: 999px;
+}
+
+.site-utilization-bar b {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 250ms ease;
+}
+
+.site-utilization-list [data-facility="factory-a"] strong::before,
+.site-utilization-list [data-facility="factory-a"] .site-utilization-bar b {
+  background: #72b7d2;
+}
+
+.site-utilization-list [data-facility="factory-b"] strong::before,
+.site-utilization-list [data-facility="factory-b"] .site-utilization-bar b {
+  background: #52aa84;
+}
+
+.site-utilization-list [data-facility="utility"] strong::before,
+.site-utilization-list [data-facility="utility"] .site-utilization-bar b {
+  background: #8063b4;
+}
+
+.site-utilization-list [data-facility="logistics"] strong::before,
+.site-utilization-list [data-facility="logistics"] .site-utilization-bar b {
+  background: #c27d2f;
+}
+
+/*
+ * 물류 작업 현황
+ */
+.site-logistics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0;
+}
+
+.site-logistics-grid div {
+  min-width: 0;
+  padding: 7px 8px;
+  background: rgba(249, 240, 227, 0.78);
+  border: 1px solid rgba(194, 125, 47, 0.2);
+  border-radius: 6px;
+}
+
+.site-logistics-grid dt {
+  color: #9a7038;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.site-logistics-grid dd {
+  margin: 4px 0 0;
+  color: #7a4c14;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * 경고 설비 목록
+ */
+.site-alert-list {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-alert-list button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(255, 246, 232, 0.9);
+  border: 1px solid rgba(216, 163, 75, 0.28);
+  border-radius: 7px;
+  transition: border-color 150ms ease, background 150ms ease,
+    transform 150ms ease;
+}
+
+.site-alert-list button:hover {
+  background: #fff;
+  border-color: rgba(216, 163, 75, 0.6);
+  transform: translateX(2px);
+}
+
+.site-alert-list button > div {
+  min-width: 0;
+}
+
+.site-alert-list strong {
+  display: block;
+  overflow: hidden;
+  color: #7a4c14;
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.site-alert-list small {
+  display: block;
+  margin-top: 2px;
+  color: #a3855d;
+  font-size: 8px;
+}
+
+.site-alert-list i {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: #c08a34;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.site-alert-empty {
+  padding: 9px 8px;
+  color: #6f8b90;
+  font-size: 9px;
+  text-align: center;
+  background: rgba(233, 241, 239, 0.7);
+  border-radius: 7px;
+}
+
+.legend-panel {
+  left: 24px;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 9px 18px;
+  padding: 14px 16px;
+  border-radius: 10px;
+}
+
+.legend-panel strong {
+  grid-column: 1 / -1;
+  margin-bottom: 2px;
+  color: #264b55;
+  font-size: 11px;
+}
+
+.legend-panel span {
+  position: relative;
+  padding-left: 14px;
+  color: #607b82;
+  font-size: 10px;
+}
+
+.legend-panel span::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.legend-panel .factory-a::before {
+  background: #72b7d2;
+}
+
+.legend-panel .factory-b::before {
+  background: #82c9ad;
+}
+
+.legend-panel .utility::before {
+  background: #b7a4d8;
+}
+
+.legend-panel .logistics::before {
+  background: #e5b875;
+}

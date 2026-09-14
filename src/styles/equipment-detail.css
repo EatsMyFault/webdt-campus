@@ -1,0 +1,562 @@
+/*
+ * 생산 설비 상세정보 모달 (공통 모달 골격 포함)
+ */
+
+.equipment-detail-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  padding: 34px;
+  background: rgba(25, 52, 60, 0.28);
+  backdrop-filter: blur(4px);
+  place-items: center;
+}
+.equipment-detail-card {
+  width: min(1040px, calc(100vw - 68px));
+  max-height: calc(100vh - 68px);
+  overflow: auto;
+  color: #294b54;
+  background: rgba(248, 252, 251, 0.98);
+  border: 1px solid rgba(50, 111, 119, 0.24);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgba(31, 61, 68, 0.28);
+}
+
+.equipment-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  background: rgba(248, 252, 251, 0.96);
+  border-bottom: 1px solid rgba(52, 111, 119, 0.14);
+  backdrop-filter: blur(12px);
+}
+
+.equipment-detail-heading,
+.equipment-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.equipment-detail-eyebrow {
+  padding: 8px 10px;
+  color: #257e74;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: #e2f3ef;
+  border-radius: 7px;
+}
+
+.equipment-detail-heading p,
+.equipment-detail-heading h2 {
+  margin: 0;
+}
+
+.equipment-detail-heading p {
+  color: #7c9196;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.equipment-detail-heading h2 {
+  margin-top: 2px;
+  color: #173a43;
+  font-size: 22px;
+}
+
+.equipment-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  color: #137e69;
+  font-size: 10px;
+  font-weight: 900;
+  background: #ddf5ed;
+  border-radius: 999px;
+}
+
+.equipment-status-badge::before {
+  width: 7px;
+  height: 7px;
+  background: #25bb91;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(37, 187, 145, 0.12);
+  content: "";
+}
+
+.equipment-detail-modal[data-status="warning"] .equipment-status-badge {
+  color: #9a6811;
+  background: #fff0d5;
+}
+
+.equipment-detail-modal[data-status="warning"] .equipment-status-badge::before,
+.equipment-detail-modal[data-status="warning"] .equipment-alert i {
+  background: #eea72f;
+  box-shadow: 0 0 0 4px rgba(238, 167, 47, 0.13);
+}
+
+.equipment-detail-modal[data-status="idle"] .equipment-status-badge {
+  color: #657980;
+  background: #e8eeee;
+}
+
+.equipment-detail-modal[data-status="idle"] .equipment-status-badge::before {
+  background: #8ea1a5;
+  box-shadow: 0 0 0 4px rgba(142, 161, 165, 0.14);
+}
+
+.equipment-detail-modal[data-status="stopped"] .equipment-status-badge {
+  color: #a04c4c;
+  background: #f9e2e2;
+}
+
+.equipment-detail-modal[data-status="stopped"] .equipment-status-badge::before,
+.equipment-detail-modal[data-status="stopped"] .equipment-alert i {
+  background: #df6464;
+  box-shadow: 0 0 0 4px rgba(223, 100, 100, 0.14);
+}
+
+.equipment-detail-close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #58727a;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  background: #eaf2f1;
+  border: 0;
+  border-radius: 8px;
+  place-items: center;
+}
+
+.equipment-detail-close:hover {
+  color: #1d5757;
+  background: #dcebea;
+}
+
+.equipment-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 18px 24px 22px;
+}
+
+.equipment-identity-panel,
+.equipment-detail-section {
+  background: #fff;
+  border: 1px solid rgba(47, 107, 116, 0.13);
+  border-radius: 11px;
+  box-shadow: 0 7px 18px rgba(51, 91, 98, 0.055);
+}
+
+.equipment-identity-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 17px;
+}
+
+.equipment-identity-icon {
+  position: relative;
+  display: grid;
+  width: 96px;
+  height: 76px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #dcebea, #f1f7f5);
+  border: 1px solid rgba(48, 126, 124, 0.13);
+  border-radius: 9px;
+  place-items: center;
+}
+
+.equipment-identity-icon i:first-child {
+  width: 56px;
+  height: 38px;
+  background: #d8e1e0;
+  border: 5px solid #35565c;
+  border-radius: 5px;
+}
+
+.equipment-identity-icon i:nth-child(2) {
+  position: absolute;
+  width: 20px;
+  height: 22px;
+  margin-left: 3px;
+  background: #5ea2aa;
+  border-radius: 2px;
+}
+
+.equipment-identity-icon i:last-child {
+  position: absolute;
+  right: 19px;
+  bottom: 15px;
+  width: 7px;
+  height: 7px;
+  background: #2fc29a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(47, 194, 154, 0.15);
+}
+
+.equipment-identity-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 22px;
+  margin: 0;
+}
+
+.equipment-identity-list div {
+  display: flex;
+  gap: 12px;
+}
+
+.equipment-identity-list dt,
+.equipment-identity-list dd {
+  margin: 0;
+  font-size: 10px;
+}
+
+.equipment-identity-list dt {
+  color: #809398;
+}
+
+.equipment-identity-list dd {
+  color: #244952;
+  font-weight: 800;
+}
+
+.equipment-identity-panel > div:last-child > p {
+  margin: 10px 0 0;
+  color: #698187;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.equipment-detail-section {
+  padding: 16px;
+}
+
+.equipment-sensor-section,
+.equipment-production-section {
+  grid-column: 1 / -1;
+}
+
+.equipment-section-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 13px;
+}
+
+.equipment-section-title span,
+.equipment-section-title h3 {
+  margin: 0;
+}
+
+.equipment-section-title span {
+  color: #3b9589;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.equipment-section-title h3 {
+  margin-top: 2px;
+  color: #264a53;
+  font-size: 13px;
+}
+
+.equipment-section-title small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #84979b;
+  font-size: 8px;
+}
+
+.equipment-section-title small i {
+  width: 6px;
+  height: 6px;
+  background: #33b99a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(51, 185, 154, 0.11);
+}
+
+.equipment-section-title > strong {
+  color: #218d79;
+  font-size: 18px;
+}
+
+.equipment-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.equipment-metric {
+  padding: 12px;
+  background: #f0f6f4;
+  border: 1px solid rgba(52, 122, 123, 0.1);
+  border-radius: 8px;
+}
+
+.equipment-metric > span,
+.equipment-metric > strong {
+  display: block;
+}
+
+.equipment-metric > span {
+  color: #748c91;
+  font-size: 9px;
+}
+
+.equipment-metric > strong {
+  margin-top: 7px;
+  color: #224b54;
+  font-size: 19px;
+}
+
+.equipment-metric > strong small {
+  margin-left: 4px;
+  color: #789095;
+  font-size: 8px;
+}
+
+.equipment-metric.emphasis {
+  background: #fff5e3;
+  border-color: rgba(222, 151, 32, 0.22);
+}
+
+.equipment-metric.emphasis > strong {
+  color: #b47713;
+}
+
+.equipment-chart {
+  height: 118px;
+  padding: 5px 2px 0;
+  background: linear-gradient(180deg, #f2f8f7, rgba(250, 253, 252, 0.6));
+  border-radius: 8px;
+}
+
+.equipment-chart svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.equipment-chart-grid {
+  fill: none;
+  stroke: rgba(57, 109, 116, 0.12);
+  stroke-width: 0.35;
+}
+
+#equipment-temperature-line {
+  fill: none;
+  stroke: #299e8e;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.equipment-production-grid,
+.equipment-maintenance-grid {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.equipment-production-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.equipment-maintenance-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.equipment-production-grid div,
+.equipment-maintenance-grid div {
+  min-width: 0;
+  padding: 10px;
+  background: #f4f8f7;
+  border-radius: 7px;
+}
+
+.equipment-production-grid dt,
+.equipment-production-grid dd,
+.equipment-maintenance-grid dt,
+.equipment-maintenance-grid dd {
+  margin: 0;
+}
+
+.equipment-production-grid dt,
+.equipment-maintenance-grid dt {
+  color: #83969b;
+  font-size: 8px;
+}
+
+.equipment-production-grid dd,
+.equipment-maintenance-grid dd {
+  margin-top: 5px;
+  overflow: hidden;
+  color: #294d55;
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equipment-production-bar {
+  height: 6px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: #e2ece9;
+  border-radius: 999px;
+}
+
+.equipment-production-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #279d8e, #58c4ae);
+  border-radius: inherit;
+  transition: width 260ms ease;
+}
+
+.equipment-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 9px 10px;
+  color: #55727a;
+  font-size: 9px;
+  background: #eef5f3;
+  border-radius: 7px;
+}
+
+.equipment-alert i {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: #2ab792;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(42, 183, 146, 0.12);
+}
+
+.equipment-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 24px 17px;
+  color: #7d9297;
+  font-size: 8px;
+  border-top: 1px solid rgba(52, 111, 119, 0.12);
+}
+
+.equipment-detail-footer button {
+  min-width: 82px;
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+  background: #277e78;
+  border: 0;
+  border-radius: 7px;
+}
+
+.equipment-detail-footer button:hover {
+  background: #1f6e69;
+}
+
+@media (max-width: 760px) {
+  .viewpoint-panel {
+    top: 12px;
+    left: 12px;
+    width: 180px;
+  }
+
+  .site-panel {
+    top: 12px;
+    right: 12px;
+    width: 190px;
+  }
+
+  .door-control-panel {
+    top: 198px;
+    right: 12px;
+    width: 190px;
+  }
+
+  .logistics-door-panel {
+    max-height: calc(100vh - 286px);
+  }
+
+  .legend-panel {
+    bottom: 12px;
+    left: 12px;
+  }
+
+  .graphics-panel {
+    right: 12px;
+    bottom: 12px;
+    width: 190px;
+  }
+
+  .equipment-detail-modal {
+    padding: 12px;
+  }
+
+  .equipment-detail-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+  }
+
+  .equipment-detail-header {
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .equipment-detail-eyebrow,
+  .equipment-detail-actions .equipment-status-badge {
+    display: none;
+  }
+
+  .equipment-detail-body {
+    grid-template-columns: 1fr;
+    padding: 12px 15px 18px;
+  }
+
+  .equipment-identity-panel,
+  .equipment-sensor-section,
+  .equipment-production-section {
+    grid-column: auto;
+  }
+
+  .equipment-identity-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-identity-icon {
+    display: none;
+  }
+
+  .equipment-metric-grid,
+  .equipment-production-grid,
+  .equipment-maintenance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

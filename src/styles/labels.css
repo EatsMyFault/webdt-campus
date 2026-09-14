@@ -1,0 +1,89 @@
+/*
+ * 3D 씬 위에 떠 있는 구역 · 건물 라벨
+ */
+
+.site-zone-label {
+  padding: 7px 10px;
+  color: #244550;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid color-mix(in srgb, var(--zone-accent) 48%, transparent);
+  border-left: 4px solid var(--zone-accent);
+  border-radius: 7px;
+  box-shadow: 0 7px 18px rgba(51, 78, 84, 0.16);
+  transform: translateY(-8px);
+}
+
+.factory-building-label {
+  color: #274851;
+}
+
+.facility-label-visual {
+  min-width: 190px;
+  padding: 10px 13px;
+  background: rgba(252, 254, 253, 0.92);
+  border: 1px solid rgba(44, 136, 139, 0.28);
+  border-left: 4px solid #2b9c8c;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(45, 82, 89, 0.18);
+  transform-origin: center center;
+  transform: translateY(-8px)
+    scale(var(--facility-label-scale, 1));
+  will-change: transform;
+}
+
+.factory-building-label span,
+.factory-building-label strong,
+.factory-building-label small {
+  display: block;
+}
+
+.factory-building-label span {
+  margin-bottom: 3px;
+  color: #278b7c;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.factory-building-label strong {
+  color: #203f48;
+  font-size: 12px;
+}
+
+.factory-building-label small {
+  margin-top: 3px;
+  color: #789095;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.factory-b-building-label .facility-label-visual {
+  border-color: rgba(49, 151, 112, 0.3);
+  border-left-color: #319770;
+}
+
+.factory-b-building-label span {
+  color: #298665;
+}
+
+.utility-building-label .facility-label-visual {
+  border-color: rgba(118, 99, 169, 0.3);
+  border-left-color: #7663a9;
+}
+
+.utility-building-label span {
+  color: #69559f;
+}
+
+.logistics-building-label .facility-label-visual {
+  border-color: rgba(194, 125, 47, 0.34);
+  border-left-color: #c27d2f;
+}
+
+.logistics-building-label span {
+  color: #a96824;
+}

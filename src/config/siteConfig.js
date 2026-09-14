@@ -1,0 +1,52 @@
+export const SITE = Object.freeze({
+  width: 1240,
+  depth: 900,
+  worldWidth: 2200,
+  worldDepth: 1700,
+  roadWidth: 32,
+  plotWidth: 520,
+  plotDepth: 360,
+});
+
+export const SITE_ZONES = Object.freeze([
+  {
+    id: "factory-a",
+    label: "정밀가공 생산 A동 구역",
+    position: [-300, -220],
+    size: [520, 360],
+    color: 0x86c5b7,
+    accent: "#2f9e89",
+    opacity: 0.16,
+    showLabel: false,
+  },
+  {
+    id: "factory-b",
+    label: "스마트 조립 생산 B동 구역",
+    position: [300, -220],
+    size: [520, 360],
+    color: 0x85b9d3,
+    accent: "#3c86ad",
+    opacity: 0.16,
+    showLabel: false,
+  },
+  {
+    id: "utility",
+    label: "통합 유틸리티 센터",
+    position: [-300, 220],
+    size: [520, 360],
+    color: 0xb7a4d8,
+    accent: "#8063b4",
+    opacity: 0.16,
+    showLabel: false,
+  },
+  {
+    id: "logistics",
+    label: "물류·출하 예정 부지",
+    position: [300, 220],
+    size: [520, 360],
+    color: 0xe5b875,
+    accent: "#c27d2f",
+    opacity: 0.2,
+    showLabel: false,
+  },
+]);

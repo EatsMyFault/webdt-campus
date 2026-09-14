@@ -1,0 +1,339 @@
+/*
+ * 좌측 뷰포인트 패널 · 그래픽 품질 패널 · 하위 뷰 버튼
+ */
+
+.site-panel,
+.viewpoint-panel,
+.door-control-panel,
+.graphics-panel,
+.legend-panel {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid rgba(59, 117, 129, 0.2);
+  background: rgba(250, 253, 252, 0.82);
+  box-shadow: 0 14px 40px rgba(53, 89, 97, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.viewpoint-panel {
+  top: 24px;
+  left: 24px;
+  width: 214px;
+  max-height: calc(100vh - 170px);
+  padding: 17px;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+.site-subviews[hidden],
+.door-control-panel[hidden],
+.graphics-options[hidden],
+.equipment-detail-modal[hidden] {
+  display: none;
+}
+
+.graphics-panel {
+  right: 24px;
+  bottom: 24px;
+  width: 248px;
+  overflow: hidden;
+  border-radius: 11px;
+}
+
+.graphics-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 14px;
+  color: #294c54;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.graphics-toggle-button span,
+.graphics-toggle-button small,
+.graphics-toggle-button strong {
+  display: block;
+}
+
+.graphics-toggle-button small {
+  margin-bottom: 2px;
+  color: #419a8d;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.graphics-toggle-button strong {
+  font-size: 11px;
+}
+
+.graphics-toggle-button b {
+  color: #217f74;
+  font-size: 10px;
+}
+
+.graphics-toggle-button b::after {
+  display: inline-block;
+  margin-left: 7px;
+  content: "▴";
+  transform: rotate(180deg);
+  transition: transform 150ms ease;
+}
+
+.graphics-panel.open .graphics-toggle-button b::after {
+  transform: rotate(0deg);
+}
+
+.graphics-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 0 12px 12px;
+  border-top: 1px solid rgba(49, 107, 119, 0.12);
+}
+
+.graphics-options button {
+  min-width: 0;
+  margin-top: 9px;
+  padding: 8px;
+  color: #617b81;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(239, 247, 245, 0.72);
+  border: 1px solid rgba(54, 111, 118, 0.14);
+  border-radius: 7px;
+}
+
+.graphics-options button strong,
+.graphics-options button small {
+  display: block;
+}
+
+.graphics-options button strong {
+  color: #33565e;
+  font-size: 9px;
+}
+
+.graphics-options button small {
+  margin-top: 2px;
+  font-size: 7px;
+}
+
+.graphics-options button.active {
+  background: rgba(222, 243, 238, 0.96);
+  border-color: #43a998;
+  box-shadow: 0 4px 12px rgba(44, 126, 118, 0.11);
+}
+
+.viewpoint-panel > p {
+  margin: 0 0 4px;
+  color: #419a8d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.viewpoint-panel h2 {
+  margin: 0 0 13px;
+  color: #193c46;
+  font-size: 16px;
+}
+
+.viewpoint-list {
+  display: grid;
+  gap: 7px;
+}
+
+.viewpoint-list button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  overflow: hidden;
+  color: #425f67;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(235, 244, 242, 0.75);
+  border: 1px solid rgba(63, 117, 124, 0.13);
+  border-radius: 8px;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.viewpoint-list button::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: #72b7d2;
+  content: "";
+}
+
+.viewpoint-list button[data-viewpoint="campus-overview"]::before {
+  background: #315e68;
+}
+
+.viewpoint-list button[data-viewpoint="factory-b"]::before {
+  background: #52aa84;
+}
+
+.viewpoint-list button[data-viewpoint="utility"]::before {
+  background: #8c72bd;
+}
+
+.viewpoint-list button[data-viewpoint="logistics"]::before {
+  background: #d38b3d;
+}
+
+.viewpoint-list button:hover {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(42, 137, 129, 0.38);
+  transform: translateX(2px);
+}
+
+.viewpoint-list button.active {
+  background: rgba(222, 243, 238, 0.96);
+  border-color: #43a998;
+  box-shadow: 0 5px 14px rgba(44, 126, 118, 0.13);
+}
+
+.site-subviews {
+  display: grid;
+  gap: 5px;
+  margin: -1px 0 2px 13px;
+  padding: 7px 0 4px 10px;
+  border-left: 1px solid rgba(66, 142, 137, 0.32);
+}
+
+.site-subviews > small {
+  margin: 0 0 1px 2px;
+  color: #5c8a87;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.site-subviews button {
+  gap: 8px;
+  padding: 7px 8px;
+  background: rgba(244, 249, 248, 0.76);
+}
+
+.site-subviews button::before {
+  width: 2px;
+}
+
+.site-subviews button b {
+  display: grid;
+  flex: 0 0 23px;
+  width: 23px;
+  height: 23px;
+  color: #43827c;
+  font-size: 8px;
+  background: rgba(220, 240, 236, 0.9);
+  border-radius: 5px;
+  place-items: center;
+}
+
+.site-subviews button strong {
+  font-size: 10px;
+}
+
+.site-subviews button small {
+  font-size: 7px;
+}
+
+.factory-b-subviews {
+  border-left-color: rgba(58, 152, 111, 0.34);
+}
+
+.factory-b-subviews button::before {
+  background: #52aa84;
+}
+
+.factory-b-subviews button b {
+  color: #327b5d;
+  background: rgba(220, 241, 230, 0.92);
+}
+
+.viewpoint-list kbd {
+  display: grid;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  color: #2c756f;
+  font-size: 10px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(46, 117, 116, 0.22);
+  border-radius: 6px;
+  place-items: center;
+}
+
+.viewpoint-list span,
+.viewpoint-list strong,
+.viewpoint-list small {
+  display: block;
+}
+
+.viewpoint-list strong {
+  color: #294c54;
+  font-size: 11px;
+}
+
+.viewpoint-list small {
+  margin-top: 2px;
+  color: #7c9196;
+  font-size: 8px;
+}
+
+.viewpoint-help {
+  display: block;
+  margin-top: 10px;
+  color: #84979c;
+  font-size: 8px;
+  text-align: center;
+}
+
+.utility-subviews {
+  border-left-color: rgba(118, 99, 169, 0.36);
+}
+
+.utility-subviews button::before {
+  background: #8063b4;
+}
+
+.utility-subviews button b {
+  color: #69549e;
+  background: rgba(235, 229, 247, 0.94);
+}
+
+.utility-subviews button.active {
+  background: rgba(238, 233, 248, 0.96);
+  border-color: rgba(118, 99, 169, 0.55);
+  box-shadow: 0 5px 14px rgba(100, 79, 154, 0.13);
+}
+
+.logistics-subviews {
+  border-left-color: rgba(194, 125, 47, 0.38);
+}
+
+.logistics-subviews button::before {
+  background: #c27d2f;
+}
+
+.logistics-subviews button b {
+  color: #9b5f22;
+  background: rgba(249, 235, 216, 0.94);
+}
+
+.logistics-subviews button.active {
+  background: rgba(250, 239, 222, 0.96);
+  border-color: rgba(194, 125, 47, 0.55);
+  box-shadow: 0 5px 14px rgba(154, 97, 35, 0.13);
+}
