@@ -1,14 +1,21 @@
 /*
- * 우측 상단 단지 통합 관제 패널.
+ * 우측 상단 통합 관제 패널.
  *
  * 설비 데이터의 정적 상태 위에 물류 트럭·도크의 실시간 상태를 덮어
- * 전체 설비 수, 상태별 집계, 건물별 가동률, 경고 목록,
- * 물류 작업 현황을 한 화면에 보여준다.
+ * 설비 수, 상태별 집계, 가동률, 경고 목록, 물류 작업 현황을 보여준다.
+ *
+ * 표시 범위는 현재 시점을 따라간다.
+ *   단지 전체 시점 → 전체 집계 + 건물별 가동률 + 전체 경고
+ *   건물 시점     → 그 건물만. KPI 카드와 가동률이 건물 지표로 바뀐다.
  */
 
 import {
   createSiteKpiDashboard,
 } from "./siteKpiDashboard.js";
+
+import {
+  hasFacilityKpi,
+} from "../data/facilityKpiData.js";
 
 const STATUS_KEYS = Object.freeze([
   "running",
@@ -28,33 +35,40 @@ const FACILITY_ORDER = Object.freeze([
   "logistics",
 ]);
 
-function createUtilizationRow(facility) {
+function createUtilizationRow(group) {
   const item = document.createElement("li");
   const head = document.createElement("div");
   const name = document.createElement("strong");
   const count = document.createElement("small");
+  const alert = document.createElement("mark");
   const rate = document.createElement("em");
   const bar = document.createElement("i");
   const fill = document.createElement("b");
 
-  item.dataset.facility = facility.id;
+  /*
+   * 색은 건물별로 정해져 있어 설비 유형 행에도 같은 값을 물린다.
+   */
+  item.dataset.facility = group.facilityId;
   head.className = "site-utilization-head";
   bar.className = "site-utilization-bar";
-  name.textContent = facility.label;
+  alert.className = "site-utilization-alert";
+  alert.hidden = true;
+  name.textContent = group.label;
 
-  head.append(name, count, rate);
+  head.append(name, count, alert, rate);
   bar.append(fill);
   item.append(head, bar);
 
   return {
     element: item,
     count,
+    alert,
     rate,
     fill,
   };
 }
 
-function createAlertItem(equipment) {
+function createAlertItem(equipment, metaLabel) {
   const item = document.createElement("li");
   const button = document.createElement("button");
   const body = document.createElement("div");
@@ -66,7 +80,7 @@ function createAlertItem(equipment) {
   button.dataset.facility = equipment.facilityId;
   button.title = `${equipment.facilityLabel} 시점으로 이동`;
   name.textContent = equipment.name;
-  meta.textContent = `${equipment.facilityLabel} · ${equipment.id}`;
+  meta.textContent = `${metaLabel} · ${equipment.id}`;
   arrow.textContent = "›";
 
   body.append(name, meta);
@@ -76,13 +90,13 @@ function createAlertItem(equipment) {
   return item;
 }
 
-function createEmptyAlertItem() {
+function createEmptyAlertItem(message) {
   const item = document.createElement("li");
-  const message = document.createElement("p");
+  const text = document.createElement("p");
 
-  message.className = "site-alert-empty";
-  message.textContent = "현재 경고 상태인 설비가 없습니다.";
-  item.append(message);
+  text.className = "site-alert-empty";
+  text.textContent = message;
+  item.append(text);
 
   return item;
 }
@@ -98,15 +112,24 @@ export function createSiteControlPanel({
     throw new Error("단지 관제 패널 요소를 찾을 수 없습니다.");
   }
 
+  const titleValue = root.querySelector("#site-panel-title");
+  const summaryLabel = root.querySelector("#site-summary-label");
   const totalValue = root.querySelector("#site-total-count");
   const updatedValue = root.querySelector("#site-panel-updated");
+  const utilizationTitle = root.querySelector(
+    "#site-utilization-title",
+  );
   const utilizationList = root.querySelector(
     "#site-utilization-list",
+  );
+  const kpiSection = root.querySelector("#site-kpi-dashboard");
+  const logisticsSection = root.querySelector(
+    "#site-logistics-section",
   );
   const alertList = root.querySelector("#site-alert-list");
   const alertCount = root.querySelector("#site-alert-count");
   const kpiDashboard = createSiteKpiDashboard({
-    root: root.querySelector("#site-kpi-dashboard"),
+    root: kpiSection,
   });
 
   const statusValues = new Map(
@@ -137,6 +160,10 @@ export function createSiteControlPanel({
     };
   }).filter((facility) => facility.items.length > 0);
 
+  const facilityById = new Map(
+    facilities.map((facility) => [facility.id, facility]),
+  );
+
   const totalDocks = equipment.filter(
     (item) => item.type === "shipping-dock",
   ).length;
@@ -145,17 +172,38 @@ export function createSiteControlPanel({
     (item) => item.type === "truck",
   ).length;
 
-  const rows = facilities.map(createUtilizationRow);
-
-  utilizationList.append(
-    ...rows.map((row) => row.element),
-  );
-
-  totalValue.textContent = String(equipment.length);
-
   /*
-   * 경고 목록은 구성이 바뀔 때만 다시 만든다.
+   * 가동률 행의 묶음 단위.
+   * 단지 전체 시점은 건물별로, 건물 시점은 설비 유형별로 나눈다.
    */
+  function createGroups(facility) {
+    if (!facility) {
+      return facilities.map((item) => ({
+        facilityId: item.id,
+        label: item.label,
+        items: item.items,
+      }));
+    }
+
+    const byTypeLabel = new Map();
+
+    facility.items.forEach((item) => {
+      const group = byTypeLabel.get(item.typeLabel) ?? [];
+
+      group.push(item);
+      byTypeLabel.set(item.typeLabel, group);
+    });
+
+    return [...byTypeLabel].map(([label, items]) => ({
+      facilityId: facility.id,
+      label,
+      items,
+    }));
+  }
+
+  let activeFacility = null;
+  let groups = [];
+  let rows = [];
   let renderedAlertKey = null;
 
   function handleAlertClick(event) {
@@ -185,9 +233,35 @@ export function createSiteControlPanel({
 
     alertList.replaceChildren(
       ...(alerts.length
-        ? alerts.map(createAlertItem)
-        : [createEmptyAlertItem()]),
+        ? alerts.map((item) =>
+          createAlertItem(
+            item,
+            activeFacility
+              ? item.typeLabel
+              : item.facilityLabel,
+          ))
+        : [
+          createEmptyAlertItem(
+            activeFacility
+              ? "이 건물에는 경고 상태인 설비가 없습니다."
+              : "현재 경고 상태인 설비가 없습니다.",
+          ),
+        ]),
     );
+  }
+
+  function readLogisticsSummary() {
+    const summary = getLogisticsSummary?.() ?? {
+      handlingTrucks: 0,
+      movingTrucks: 0,
+      occupiedDocks: 0,
+    };
+
+    return {
+      ...summary,
+      totalDocks,
+      totalTrucks,
+    };
   }
 
   function update(elapsedSeconds = 0) {
@@ -200,10 +274,11 @@ export function createSiteControlPanel({
 
     const alerts = [];
 
-    facilities.forEach((facility, index) => {
+    groups.forEach((group, index) => {
       let running = 0;
+      let warning = 0;
 
-      facility.items.forEach((item) => {
+      group.items.forEach((item) => {
         const status = resolveStatus(item);
 
         if (status in counts) {
@@ -215,19 +290,22 @@ export function createSiteControlPanel({
         }
 
         if (status === "warning") {
+          warning += 1;
           alerts.push(item);
         }
       });
 
       const rate = Math.round(
-        (running / facility.items.length) * 100,
+        (running / group.items.length) * 100,
       );
       const row = rows[index];
 
       row.count.textContent =
-        `${running} / ${facility.items.length}대`;
+        `${running} / ${group.items.length}대`;
       row.rate.textContent = `${rate}%`;
       row.fill.style.width = `${rate}%`;
+      row.alert.textContent = `경고 ${warning}`;
+      row.alert.hidden = warning === 0;
     });
 
     STATUS_KEYS.forEach((status) => {
@@ -235,28 +313,29 @@ export function createSiteControlPanel({
         String(counts[status]);
     });
 
-    kpiDashboard.update({
-      elapsedSeconds,
-      statusCounts: counts,
-    });
+    const logistics = readLogisticsSummary();
+
+    if (!kpiSection.hidden) {
+      kpiDashboard.update({
+        elapsedSeconds,
+        statusCounts: counts,
+        logistics,
+      });
+    }
 
     alertCount.textContent = `${alerts.length}건`;
     renderAlerts(alerts);
 
-    const logistics = getLogisticsSummary?.() ?? {
-      handlingTrucks: 0,
-      movingTrucks: 0,
-      occupiedDocks: 0,
-    };
+    if (!logisticsSection.hidden) {
+      logisticsValues.handling.textContent =
+        `${logistics.handlingTrucks} / ${totalTrucks}대`;
 
-    logisticsValues.handling.textContent =
-      `${logistics.handlingTrucks} / ${totalTrucks}대`;
+      logisticsValues.moving.textContent =
+        `${logistics.movingTrucks}대`;
 
-    logisticsValues.moving.textContent =
-      `${logistics.movingTrucks}대`;
-
-    logisticsValues.docks.textContent =
-      `${logistics.occupiedDocks} / ${totalDocks}`;
+      logisticsValues.docks.textContent =
+        `${logistics.occupiedDocks} / ${totalDocks}`;
+    }
 
     updatedValue.textContent =
       new Date().toLocaleTimeString("ko-KR", {
@@ -267,11 +346,64 @@ export function createSiteControlPanel({
       });
   }
 
+  /*
+   * 현재 시점의 건물로 패널 범위를 바꾼다.
+   * facilityId가 없으면 단지 전체를 본다.
+   */
+  function setFacility(facilityId = null) {
+    const facility = facilityId
+      ? facilityById.get(facilityId) ?? null
+      : null;
+
+    activeFacility = facility;
+    groups = createGroups(facility);
+    rows = groups.map(createUtilizationRow);
+
+    utilizationList.replaceChildren(
+      ...rows.map((row) => row.element),
+    );
+
+    titleValue.textContent = facility
+      ? `${facility.label} 관제`
+      : "단지 통합 관제";
+
+    summaryLabel.textContent = facility
+      ? `${facility.label} 설비`
+      : "전체 설비";
+
+    utilizationTitle.textContent = facility
+      ? "설비 유형별 가동률"
+      : "건물별 가동률";
+
+    totalValue.textContent = String(
+      (facility ? facility.items : equipment).length,
+    );
+
+    /*
+     * KPI 카드는 건물 시점 전용이다.
+     * 단지 전체 시점은 가동률·경고 요약만 남긴다.
+     */
+    const showKpi =
+      Boolean(facility) && hasFacilityKpi(facility.id);
+
+    kpiSection.hidden = !showKpi;
+
+    if (showKpi) {
+      kpiDashboard.setFacility(facility.id, facility.label);
+    }
+
+    logisticsSection.hidden = facility?.id !== "logistics";
+
+    renderedAlertKey = null;
+    update();
+  }
+
   alertList.addEventListener("click", handleAlertClick);
-  update();
+  setFacility(null);
 
   return {
     update,
+    setFacility,
 
     destroy() {
       alertList.removeEventListener("click", handleAlertClick);

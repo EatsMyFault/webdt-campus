@@ -385,7 +385,7 @@
           <header class="site-panel-head">
             <div>
               <p>SITE CONTROL</p>
-              <h2>단지 통합 관제</h2>
+              <h2 id="site-panel-title">단지 통합 관제</h2>
             </div>
 
             <small id="site-panel-updated">--:--:--</small>
@@ -393,7 +393,7 @@
 
           <section class="site-summary">
             <div class="site-summary-total">
-              <small>전체 설비</small>
+              <small id="site-summary-label">전체 설비</small>
 
               <strong>
                 <span id="site-total-count">0</span><b>대</b>
@@ -430,133 +430,18 @@
           >
             <header class="site-kpi-dashboard-head">
               <span>DAILY KPI</span>
-              <h3>금일 운영 지표</h3>
-              <small>주간조</small>
+              <h3 id="site-kpi-title">금일 운영 지표</h3>
+              <small id="site-kpi-caption">주간조</small>
             </header>
 
-            <div class="site-kpi-grid">
-              <article
-                class="site-kpi-card"
-                data-kpi="utilization"
-              >
-                <div class="site-kpi-card-head">
-                  <span>설비 가동률</span><i></i>
-                </div>
-
-                <strong class="site-kpi-value">
-                  <span id="site-kpi-utilization">--</span>
-                  <small>%</small>
-                </strong>
-
-                <p
-                  id="site-kpi-utilization-description"
-                  class="site-kpi-description"
-                ></p>
-
-                <span
-                  class="site-kpi-progress"
-                  role="progressbar"
-                  aria-label="설비 가동률"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <i id="site-kpi-utilization-fill"></i>
-                </span>
-              </article>
-
-              <article
-                class="site-kpi-card"
-                data-kpi="production"
-              >
-                <div class="site-kpi-card-head">
-                  <span>생산량</span><i></i>
-                </div>
-
-                <strong class="site-kpi-value">
-                  <span id="site-kpi-production">--</span>
-                  <small>EA</small>
-                </strong>
-
-                <p
-                  id="site-kpi-production-description"
-                  class="site-kpi-description"
-                ></p>
-
-                <span
-                  class="site-kpi-progress"
-                  role="progressbar"
-                  aria-label="금일 생산 계획 달성률"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <i id="site-kpi-production-fill"></i>
-                </span>
-              </article>
-
-              <article
-                class="site-kpi-card"
-                data-kpi="defect"
-              >
-                <div class="site-kpi-card-head">
-                  <span>불량률</span><i></i>
-                </div>
-
-                <strong class="site-kpi-value">
-                  <span id="site-kpi-defect">--</span>
-                  <small>%</small>
-                </strong>
-
-                <p
-                  id="site-kpi-defect-description"
-                  class="site-kpi-description"
-                ></p>
-
-                <span
-                  class="site-kpi-progress"
-                  role="progressbar"
-                  aria-label="불량률 목표 대비 수준"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <i id="site-kpi-defect-fill"></i>
-                </span>
-              </article>
-
-              <article
-                class="site-kpi-card"
-                data-kpi="energy"
-              >
-                <div class="site-kpi-card-head">
-                  <span>에너지 사용량</span><i></i>
-                </div>
-
-                <strong class="site-kpi-value">
-                  <span id="site-kpi-energy">--</span>
-                  <small>kWh</small>
-                </strong>
-
-                <p
-                  id="site-kpi-energy-description"
-                  class="site-kpi-description"
-                ></p>
-
-                <span
-                  class="site-kpi-progress"
-                  role="progressbar"
-                  aria-label="금일 에너지 예산 사용률"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <i id="site-kpi-energy-fill"></i>
-                </span>
-              </article>
-            </div>
+            <!-- 카드는 현재 시점에 맞춰 siteKpiDashboard가 그린다 -->
+            <div class="site-kpi-grid"></div>
           </section>
 
           <section class="site-section">
             <div class="site-section-head">
               <span>UTILIZATION</span>
-              <h3>건물별 가동률</h3>
+              <h3 id="site-utilization-title">건물별 가동률</h3>
             </div>
 
             <ul
@@ -565,7 +450,10 @@
             ></ul>
           </section>
 
-          <section class="site-section">
+          <section
+            id="site-logistics-section"
+            class="site-section"
+          >
             <div class="site-section-head">
               <span>LOGISTICS</span>
               <h3>물류 작업 현황</h3>
