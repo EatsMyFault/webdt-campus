@@ -49,8 +49,9 @@ function formatClock(time) {
 /*
  * 트럭 한 대의 전체 주행 경로.
  *
- *   정문 → 대기 위치 → 배정 도크 → 출차 위치
- *   → 단지 외곽 순환도로 한 바퀴 → 정문 밖 대기열
+ *   정문 → 대기 위치 → 배정 도크 → 출차 게이트
+ *   → 단지 외곽 순환도로 한 바퀴(동 → 북 → 서 → 남)
+ *   → 정문 밖 대기열
  */
 export function createLogisticsRoute(plan) {
   const dockX = getDockX(plan.dockNumber);
@@ -88,8 +89,19 @@ export function createLogisticsRoute(plan) {
     approaching: [
       {
         target: {
+          x: Math.min(
+            standby.x + LOGISTICS_YARD.standbyMergeX,
+            LOGISTICS_YARD.entryGateX,
+          ),
+          z: LOGISTICS_YARD.standbyLaneZ,
+        },
+        speed: plan.driveSpeed,
+        zone: "대기열 출발",
+      },
+      {
+        target: {
           x: LOGISTICS_YARD.entryGateX,
-          z: LOGISTICS_YARD.standbyZ,
+          z: LOGISTICS_YARD.standbyLaneZ,
         },
         speed: plan.driveSpeed,
         zone: "정문 진입로",
@@ -176,81 +188,45 @@ export function createLogisticsRoute(plan) {
       },
       {
         target: {
-          x: LOGISTICS_YARD.exitGateX - 14,
-          z: LOGISTICS_YARD.exitLaneZ + 4,
+          x: LOGISTICS_YARD.exitGateX,
+          z: LOGISTICS_YARD.exitLaneZ,
         },
         speed: plan.driveSpeed,
-        zone: "출차 게이트 회전 구간",
+        zone: "출차 게이트 통과",
+        gateOut: true,
       },
       {
         target: {
-          x: LOGISTICS_YARD.exitGateX + 4,
-          z: LOGISTICS_YARD.exitLaneZ + 16,
+          x: eastX - cornerRadius * 0.25,
+          z: LOGISTICS_YARD.exitLaneZ - cornerRadius * 0.25,
         },
         speed: plan.driveSpeed,
-        zone: "출차 게이트 회전 구간",
+        zone: "단지 동측 순환도로 합류",
       },
       {
         target: {
           x: eastX,
-          z: southZ - cornerRadius,
+          z: LOGISTICS_YARD.exitLaneZ - cornerRadius,
         },
         speed: plan.driveSpeed,
         zone: "단지 동측 순환도로 진입",
-        gateOut: true,
       },
     ],
 
     /*
-     * 동측 연결로에서 남측도로로 완만하게 우회전한 뒤
-     * 남 → 서 → 북 → 동 → 남 순서로 외곽을 한 바퀴 돈다.
+     * 출차 게이트에서 동측도로로 좌회전해 북상한 뒤
+     * 동 → 북 → 서 → 남 순서로 외곽을 한 바퀴 돈다.
      * 각 모서리에는 회전 반경을 둬 직각 이동과 U턴을 피한다.
+     *
+     * 대기열은 정문 서쪽으로 늘어서므로 마지막 남측 구간은
+     * 서쪽에서 동쪽으로 달려 대기열 꼬리 방향에서 합류한다.
+     * 반대로 돌면 대기 중인 트럭을 정면으로 통과하게 된다.
      */
     circulating: [
       createLoopLeg(
-        eastX - cornerRadius * 0.25,
-        southZ - cornerRadius * 0.25,
-        "남동측 도로 합류",
-      ),
-      createLoopLeg(
-        eastX - cornerRadius,
-        southZ,
-        "단지 남측 순환도로",
-      ),
-      createLoopLeg(
-        westX + cornerRadius,
-        southZ,
-        "단지 남측 순환도로",
-      ),
-      createLoopLeg(
-        westX + cornerRadius * 0.25,
-        southZ - cornerRadius * 0.25,
-        "단지 남서측 회전 구간",
-      ),
-      createLoopLeg(
-        westX,
-        southZ - cornerRadius,
-        "단지 서측 순환도로",
-      ),
-      createLoopLeg(
-        westX,
+        eastX,
         northZ + cornerRadius,
-        "단지 서측 순환도로",
-      ),
-      createLoopLeg(
-        westX + cornerRadius * 0.25,
-        northZ + cornerRadius * 0.25,
-        "단지 북서측 회전 구간",
-      ),
-      createLoopLeg(
-        westX + cornerRadius,
-        northZ,
-        "단지 북측 순환도로",
-      ),
-      createLoopLeg(
-        eastX - cornerRadius,
-        northZ,
-        "단지 북측 순환도로",
+        "단지 동측 순환도로",
       ),
       createLoopLeg(
         eastX - cornerRadius * 0.25,
@@ -258,30 +234,65 @@ export function createLogisticsRoute(plan) {
         "단지 북동측 회전 구간",
       ),
       createLoopLeg(
-        eastX,
-        northZ + cornerRadius,
-        "단지 동측 순환도로",
-      ),
-      createLoopLeg(
-        eastX,
-        southZ - cornerRadius,
-        "단지 동측 순환도로",
-      ),
-      createLoopLeg(
-        eastX - cornerRadius * 0.25,
-        southZ - cornerRadius * 0.25,
-        "단지 남동측 회전 구간",
-      ),
-      createLoopLeg(
         eastX - cornerRadius,
+        northZ,
+        "단지 북측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius,
+        northZ,
+        "단지 북측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius * 0.25,
+        northZ + cornerRadius * 0.25,
+        "단지 북서측 회전 구간",
+      ),
+      createLoopLeg(
+        westX,
+        northZ + cornerRadius,
+        "단지 서측 순환도로",
+      ),
+      createLoopLeg(
+        westX,
+        southZ - cornerRadius,
+        "단지 서측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius * 0.25,
+        southZ - cornerRadius * 0.25,
+        "단지 남서측 회전 구간",
+      ),
+      createLoopLeg(
+        westX + cornerRadius,
         southZ,
         "단지 남측 순환도로",
       ),
       createLoopLeg(
-        standby.x,
-        standby.z,
-        "물류센터 배차 대기열 복귀",
+        standby.x - LOGISTICS_YARD.standbyMergeX,
+        LOGISTICS_YARD.standbyLaneZ,
+        "대기열 주행 차선",
       ),
+      /*
+       * 정차 줄에 비스듬히 붙은 뒤 마지막 한 칸은 곧게 들어간다.
+       * 정차 방향과 진행 방향이 같아야 차체가 튀지 않는다.
+       */
+      {
+        target: {
+          x: standby.x - LOGISTICS_YARD.standbySpacingX / 4,
+          z: standby.z,
+        },
+        speed: plan.driveSpeed,
+        zone: "대기열 진입",
+      },
+      {
+        target: {
+          x: standby.x,
+          z: standby.z,
+        },
+        speed: plan.driveSpeed,
+        zone: "물류센터 배차 대기열 복귀",
+      },
     ],
   };
 }

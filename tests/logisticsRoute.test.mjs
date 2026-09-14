@@ -46,12 +46,16 @@ test("출차 트럭은 외곽 순환도로 한 바퀴를 돌고 대기열로 복
   const loopTargets = route.circulating.map(
     (leg) => leg.target,
   );
-  const roadTargets = loopTargets.slice(0, -1);
+  /*
+   * 마지막 두 경유점은 대기열 정차 줄로 붙는 구간이라
+   * 순환도로 범위 검사에서 제외한다.
+   */
+  const roadTargets = loopTargets.slice(0, -2);
 
   assert.deepEqual(exitTarget, {
     x: LOGISTICS_CAMPUS_LOOP.eastX,
     z:
-      LOGISTICS_CAMPUS_LOOP.southZ -
+      LOGISTICS_YARD.exitLaneZ -
       LOGISTICS_CAMPUS_LOOP.cornerRadius,
   });
 
@@ -135,6 +139,89 @@ test("출차 트럭은 외곽 순환도로 한 바퀴를 돌고 대기열로 복
     LOGISTICS_CAMPUS_LOOP.southZ,
   );
   assert.deepEqual(loopTargets.at(-1), route.standby);
+});
+
+test("순환 트럭은 대기열 꼬리 쪽에서 합류한다", () => {
+  /*
+   * 대기열은 정문에서 서쪽으로 늘어서므로, 복귀 구간은
+   * 서쪽에서 동쪽으로 달려 꼬리 방향에서 합류해야 한다.
+   * 반대로 돌면 대기 중인 트럭을 정면으로 마주 본다.
+   */
+  LOGISTICS_TRUCK_OPERATIONS.forEach((plan) => {
+    const route = createLogisticsRoute(plan);
+    const exitTarget = route.departing.at(-1).target;
+    const firstLoopTarget = route.circulating[0].target;
+    const approachTarget = route.circulating.at(-3).target;
+    const entryTarget = route.circulating.at(-2).target;
+    const arrivalTarget = route.circulating.at(-1).target;
+
+    /*
+     * 출차 게이트를 나오면 동측 순환도로를 북쪽으로 거슬러 오른다.
+     */
+    assert.equal(exitTarget.x, LOGISTICS_CAMPUS_LOOP.eastX);
+    assert.equal(firstLoopTarget.x, LOGISTICS_CAMPUS_LOOP.eastX);
+    assert.ok(firstLoopTarget.z < exitTarget.z);
+
+    /*
+     * 마지막 구간은 정차 줄 반대편 차선을 타고 동쪽으로 달리다가
+     * 자기 슬롯에서만 정차 줄로 붙고, 마지막 한 칸은 곧게 들어간다.
+     */
+    assert.ok(approachTarget.x < entryTarget.x);
+    assert.ok(entryTarget.x < arrivalTarget.x);
+    assert.equal(approachTarget.z, LOGISTICS_YARD.standbyLaneZ);
+    assert.equal(entryTarget.z, LOGISTICS_YARD.standbyZ);
+    assert.equal(arrivalTarget.z, LOGISTICS_YARD.standbyZ);
+    assert.ok(
+      LOGISTICS_YARD.standbyLaneZ < LOGISTICS_CAMPUS_LOOP.southZ,
+    );
+    assert.ok(
+      LOGISTICS_YARD.standbyZ > LOGISTICS_CAMPUS_LOOP.southZ,
+    );
+  });
+});
+
+test("트럭들은 한 주기 내내 서로 겹치지 않는다", () => {
+  /*
+   * 대기열을 지나가는 트럭이 앞 순번 자리를 밟지 않는지
+   * 실제 주행으로 확인한다. 상·하차 시간이 달라 순번이 어긋난
+   * 뒤에도 최소 차간거리가 차체 폭보다 넓게 유지돼야 한다.
+   */
+  const root = new THREE.Group();
+  const trucks = LOGISTICS_TRUCK_OPERATIONS.map((plan) => {
+    const truck = new THREE.Group();
+
+    truck.userData.equipmentId = plan.truckId;
+    root.add(truck);
+
+    return truck;
+  });
+
+  const controller = createLogisticsOperationController({ root });
+
+  let closest = Infinity;
+
+  for (let step = 0; step < 16000; step += 1) {
+    controller.update(0.05);
+
+    for (let a = 0; a < trucks.length; a += 1) {
+      for (let b = a + 1; b < trucks.length; b += 1) {
+        closest = Math.min(
+          closest,
+          Math.hypot(
+            trucks[a].position.x - trucks[b].position.x,
+            trucks[a].position.z - trucks[b].position.z,
+          ),
+        );
+      }
+    }
+  }
+
+  assert.ok(
+    closest > 14,
+    `트럭 간 최소 거리가 너무 가깝습니다: ${closest.toFixed(1)}`,
+  );
+
+  controller.destroy();
 });
 
 test("순환 운행을 마친 트럭은 숨김이나 순간이동 없이 대기 상태가 된다", () => {
