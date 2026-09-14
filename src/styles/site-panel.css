@@ -181,6 +181,10 @@
   border-top: 1px solid rgba(49, 107, 119, 0.14);
 }
 
+.site-section[hidden] {
+  display: none;
+}
+
 .site-section-head {
   display: flex;
   align-items: baseline;
@@ -251,6 +255,24 @@
   color: #8ba0a4;
   font-size: 8px;
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * 가동률 행의 경고 설비 수.
+ * 단지 전체 시점에서 어느 건물이 문제인지 바로 보이게 한다.
+ */
+.site-utilization-alert {
+  padding: 1px 5px;
+  background: rgba(208, 138, 47, 0.14);
+  color: #b0762c;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-utilization-alert[hidden] {
+  display: none;
 }
 
 .site-utilization-head em {

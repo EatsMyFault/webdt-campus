@@ -793,6 +793,15 @@ const cameraViewController =
 
 
       /*
+       * 통합 관제 패널을 현재 건물 범위로 좁힌다.
+       * 단지 전체 시점이면 activeFacilityId가 null이라 전체를 본다.
+       */
+      siteControlPanel.setFacility(
+        activeFacilityId,
+      );
+
+
+      /*
        * 왼쪽 세부 시점 목록 표시
        */
       factoryASubviews.hidden =

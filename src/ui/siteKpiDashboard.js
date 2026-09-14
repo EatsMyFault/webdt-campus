@@ -1,8 +1,13 @@
-import {
-  createSiteKpiTracker,
-} from "../data/siteKpiData.js";
+/*
+ * 통합 관제 패널의 KPI 카드 영역.
+ *
+ * 카드 구성은 건물마다 다르므로 마크업을 고정하지 않고
+ * 트래커가 돌려주는 카드 목록대로 그린다.
+ */
 
-const numberFormatter = new Intl.NumberFormat("ko-KR");
+import {
+  createFacilityKpiTracker,
+} from "../data/facilityKpiData.js";
 
 function setProgress(element, value) {
   const safeValue = Math.min(100, Math.max(0, value));
@@ -12,9 +17,48 @@ function setProgress(element, value) {
   progress?.setAttribute("aria-valuenow", safeValue.toFixed(1));
 }
 
-function formatChange(value) {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(1)}%p`;
+function createCardElement(card) {
+  const article = document.createElement("article");
+  const head = document.createElement("div");
+  const label = document.createElement("span");
+  const dot = document.createElement("i");
+  const value = document.createElement("strong");
+  const valueText = document.createElement("span");
+  const unit = document.createElement("small");
+  const description = document.createElement("p");
+  const progress = document.createElement("span");
+  const fill = document.createElement("i");
+
+  article.className = "site-kpi-card";
+  article.dataset.kpi = card.id;
+  article.dataset.tone = card.tone;
+
+  head.className = "site-kpi-card-head";
+  label.textContent = card.label;
+  head.append(label, dot);
+
+  value.className = "site-kpi-value";
+  unit.textContent = card.unit;
+  value.append(valueText, unit);
+
+  description.className = "site-kpi-description";
+
+  progress.className = "site-kpi-progress";
+  progress.setAttribute("role", "progressbar");
+  progress.setAttribute("aria-label", card.label);
+  progress.setAttribute("aria-valuemin", "0");
+  progress.setAttribute("aria-valuemax", "100");
+  progress.append(fill);
+
+  article.append(head, value, description, progress);
+
+  return {
+    element: article,
+    card: article,
+    value: valueText,
+    description,
+    fill,
+  };
 }
 
 export function createSiteKpiDashboard({ root }) {
@@ -22,109 +66,84 @@ export function createSiteKpiDashboard({ root }) {
     throw new Error("운영 KPI 대시보드 요소를 찾을 수 없습니다.");
   }
 
-  const tracker = createSiteKpiTracker();
-  const cards = {
-    utilization: root.querySelector(
-      '[data-kpi="utilization"]',
-    ),
-    production: root.querySelector(
-      '[data-kpi="production"]',
-    ),
-    defect: root.querySelector('[data-kpi="defect"]'),
-    energy: root.querySelector('[data-kpi="energy"]'),
-  };
+  const grid = root.querySelector(".site-kpi-grid");
+  const title = root.querySelector("#site-kpi-title");
+  const caption = root.querySelector("#site-kpi-caption");
 
-  const values = {
-    utilization: root.querySelector("#site-kpi-utilization"),
-    production: root.querySelector("#site-kpi-production"),
-    defect: root.querySelector("#site-kpi-defect"),
-    energy: root.querySelector("#site-kpi-energy"),
-  };
+  let tracker = null;
+  let views = [];
+  let renderedKey = null;
 
-  const descriptions = {
-    utilization: root.querySelector(
-      "#site-kpi-utilization-description",
-    ),
-    production: root.querySelector(
-      "#site-kpi-production-description",
-    ),
-    defect: root.querySelector(
-      "#site-kpi-defect-description",
-    ),
-    energy: root.querySelector(
-      "#site-kpi-energy-description",
-    ),
-  };
+  /*
+   * 카드 구성이 바뀔 때만 DOM을 다시 만든다.
+   * 같은 건물을 계속 보고 있으면 값만 갈아 끼운다.
+   */
+  function render(cards) {
+    const key = cards.map((card) => card.id).join("|");
 
-  const fills = {
-    utilization: root.querySelector(
-      "#site-kpi-utilization-fill",
-    ),
-    production: root.querySelector(
-      "#site-kpi-production-fill",
-    ),
-    defect: root.querySelector("#site-kpi-defect-fill"),
-    energy: root.querySelector("#site-kpi-energy-fill"),
-  };
+    if (key === renderedKey) {
+      return;
+    }
 
-  function update({ elapsedSeconds = 0, statusCounts = {} } = {}) {
-    const snapshot = tracker.update(
-      elapsedSeconds,
-      statusCounts,
+    renderedKey = key;
+    views = cards.map(createCardElement);
+
+    grid.replaceChildren(
+      ...views.map((view) => view.element),
     );
-
-    values.utilization.textContent =
-      snapshot.utilization.value.toFixed(1);
-    descriptions.utilization.textContent =
-      `전일 대비 ${formatChange(snapshot.utilization.change)} · ` +
-      `${snapshot.utilization.operating}/${snapshot.utilization.total}대 가동`;
-    setProgress(
-      fills.utilization,
-      snapshot.utilization.progress,
-    );
-
-    values.production.textContent = numberFormatter.format(
-      snapshot.production.value,
-    );
-    descriptions.production.textContent =
-      `계획 ${snapshot.production.rate.toFixed(1)}% · ` +
-      `목표 ${numberFormatter.format(snapshot.production.target)} EA`;
-    setProgress(
-      fills.production,
-      snapshot.production.progress,
-    );
-
-    values.defect.textContent = snapshot.defect.value.toFixed(2);
-    descriptions.defect.textContent =
-      `불량 ${numberFormatter.format(snapshot.defect.count)}건 · ` +
-      `목표 ${snapshot.defect.targetRate.toFixed(2)}% 이하`;
-    setProgress(fills.defect, snapshot.defect.progress);
-    cards.defect.dataset.level =
-      snapshot.defect.value <= snapshot.defect.targetRate
-        ? "good"
-        : "warning";
-
-    values.energy.textContent = numberFormatter.format(
-      snapshot.energy.value,
-    );
-    descriptions.energy.textContent =
-      `예산 ${snapshot.energy.rate.toFixed(1)}% · ` +
-      `현재 ${numberFormatter.format(snapshot.energy.currentPower)} kW`;
-    setProgress(fills.energy, snapshot.energy.progress);
-
-    cards.energy.dataset.level =
-      snapshot.energy.rate >= 90 ? "warning" : "normal";
-
-    return snapshot;
   }
 
-  update();
+  function paint(cards) {
+    render(cards);
+
+    cards.forEach((card, index) => {
+      const view = views[index];
+
+      view.value.textContent = card.valueText;
+      view.description.textContent = card.description;
+      view.card.dataset.level = card.level;
+      setProgress(view.fill, card.progress);
+    });
+  }
+
+  /*
+   * 시점이 바뀌면 해당 건물 트래커로 교체한다.
+   * 누적 지표는 건물마다 따로 쌓이므로 트래커도 건물마다 유지한다.
+   */
+  const trackers = new Map();
+
+  function setFacility(facilityId, facilityLabel) {
+    if (!trackers.has(facilityId)) {
+      trackers.set(
+        facilityId,
+        createFacilityKpiTracker(facilityId),
+      );
+    }
+
+    tracker = trackers.get(facilityId);
+
+    title.textContent = `${facilityLabel} 운영 지표`;
+    caption.textContent = tracker.caption;
+  }
+
+  function update(context = {}) {
+    if (!tracker) {
+      return null;
+    }
+
+    const cards = tracker.update(context);
+
+    paint(cards);
+
+    return cards;
+  }
 
   return {
+    setFacility,
     update,
 
     reset() {
-      tracker.reset();
+      trackers.forEach((item) => item.reset());
       update();
     },
   };

@@ -9,6 +9,14 @@
   border-top: 1px solid rgba(49, 107, 119, 0.14);
 }
 
+/*
+ * 단지 전체 시점에서는 KPI 카드를 감춘다.
+ * display를 지정한 선택자가 있어 [hidden]만으로는 숨겨지지 않는다.
+ */
+.site-kpi-dashboard[hidden] {
+  display: none;
+}
+
 .site-kpi-dashboard-head {
   display: flex;
   align-items: baseline;
@@ -62,20 +70,24 @@
   content: "";
 }
 
-.site-kpi-card[data-kpi="production"] {
+/*
+ * 색은 지표 종류가 아니라 카드 자리 순서(tone)를 따른다.
+ * 건물마다 지표가 달라도 네 장의 색 리듬은 같게 유지된다.
+ */
+.site-kpi-card[data-tone="flow"] {
   --kpi-color: #3c86ad;
 }
 
-.site-kpi-card[data-kpi="defect"] {
+.site-kpi-card[data-tone="caution"] {
   --kpi-color: #d08a2f;
 }
 
-.site-kpi-card[data-kpi="defect"][data-level="good"] {
-  --kpi-color: #38a77c;
+.site-kpi-card[data-tone="energy"] {
+  --kpi-color: #8063b4;
 }
 
-.site-kpi-card[data-kpi="energy"] {
-  --kpi-color: #8063b4;
+.site-kpi-card[data-level="good"] {
+  --kpi-color: #38a77c;
 }
 
 .site-kpi-card[data-level="warning"] {
