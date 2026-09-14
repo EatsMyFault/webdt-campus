@@ -33,8 +33,9 @@ export const SITE_VIEWPOINTS = Object.freeze([
     id: "factory-a-support",
     label: "A동 집진·공압실",
     description: "집진기·공기압축기",
-    position: [-526, 14, -302],
-    target: [-466, 8, -212],
+    position: [-523, 16, -198],
+    target: [-495, 7, -265],
+    fov: 52,
   },
   {
     id: "factory-a-2d",
