@@ -6,6 +6,10 @@
  * 물류 작업 현황을 한 화면에 보여준다.
  */
 
+import {
+  createSiteKpiDashboard,
+} from "./siteKpiDashboard.js";
+
 const STATUS_KEYS = Object.freeze([
   "running",
   "warning",
@@ -101,6 +105,9 @@ export function createSiteControlPanel({
   );
   const alertList = root.querySelector("#site-alert-list");
   const alertCount = root.querySelector("#site-alert-count");
+  const kpiDashboard = createSiteKpiDashboard({
+    root: root.querySelector("#site-kpi-dashboard"),
+  });
 
   const statusValues = new Map(
     STATUS_KEYS.map((status) => [
@@ -183,7 +190,7 @@ export function createSiteControlPanel({
     );
   }
 
-  function update() {
+  function update(elapsedSeconds = 0) {
     const counts = {
       running: 0,
       warning: 0,
@@ -226,6 +233,11 @@ export function createSiteControlPanel({
     STATUS_KEYS.forEach((status) => {
       statusValues.get(status).textContent =
         String(counts[status]);
+    });
+
+    kpiDashboard.update({
+      elapsedSeconds,
+      statusCounts: counts,
     });
 
     alertCount.textContent = `${alerts.length}건`;

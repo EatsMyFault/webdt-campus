@@ -1,0 +1,49 @@
+/*
+ * 화면 상단 중앙 현재 날짜 및 시각
+ */
+.campus-clock {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(250, 253, 252, 0.82);
+  border: 1px solid rgba(59, 117, 129, 0.2);
+  border-radius: 11px;
+  box-shadow: 0 14px 40px rgba(52, 89, 97, 0.12);
+  backdrop-filter: blur(14px);
+  transform: translateX(-50%);
+}
+
+.campus-clock span {
+  color: #5d8087;
+  font-size: 12px;
+}
+
+.campus-clock strong {
+  color: #193c46;
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 1050px) {
+  .campus-clock {
+    top: 14px;
+    gap: 7px;
+    padding: 7px 11px;
+  }
+
+  .campus-clock span {
+    font-size: 9px;
+  }
+
+  .campus-clock strong {
+    font-size: 14px;
+  }
+}

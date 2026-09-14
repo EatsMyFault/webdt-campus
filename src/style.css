@@ -10,6 +10,8 @@
 @import "./styles/panels.css";
 @import "./styles/door-panels.css";
 @import "./styles/site-panel.css";
+@import "./styles/campus-clock.css";
+@import "./styles/site-kpi-dashboard.css";
 @import "./styles/labels.css";
 @import "./styles/scenario-panel.css";
 

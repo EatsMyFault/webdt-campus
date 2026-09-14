@@ -43,6 +43,7 @@ Three.js와 Vite로 구현한 웹 기반 스마트 팩토리 단지 디지털 �
 - 다중 도크 셔터 개폐 제어
 - 트럭 GLB 모델 배치
 - 입차 → 대기 → 상하차 → 출차 → 단지 외곽 순환 운행 애니메이션
+- 순환 트럭 간 차선 분리와 배차 대기열 꼬리 합류
 - 물류 설비 데이터와 전용 상세정보 UI
 
 ### 관제 UI
@@ -52,6 +53,9 @@ Three.js와 Vite로 구현한 웹 기반 스마트 팩토리 단지 디지털 �
 - 선택 설비 상세정보
 - 설비 종류별 상세정보 UI 분기
 - 물류 운행 상태와 제어 패널
+- 초 단위 현재 날짜·시각 표시
+- 설비 가동률, 금일 생산량, 불량률, 에너지 사용량 KPI 대시보드
+- 설비 상태와 연동되는 가동률 및 데모 생산·에너지 누적값
 
 ### 데모 시나리오
 
@@ -76,36 +80,37 @@ Three.js와 Vite로 구현한 웹 기반 스마트 팩토리 단지 디지털 �
 
 ## 설치 및 실행
 
-```powershell
-cd E:\WebDt\webdt-campus
-npm.cmd install
-npm.cmd run dev
+```bash
+git clone https://github.com/EatsMyFault/webdt-campus.git
+cd webdt-campus
+npm install
+npm run dev
 ```
 
 터미널에 표시되는 주소를 브라우저에서 엽니다. 기본 주소는 일반적으로 `http://localhost:5173`입니다.
 
 ## 프로덕션 빌드
 
-```powershell
-npm.cmd run build
+```bash
+npm run build
 ```
 
 빌드 결과물은 `dist` 폴더에 생성됩니다. 결과물을 로컬에서 확인하려면 다음 명령을 사용합니다.
 
-```powershell
-npm.cmd run preview
+```bash
+npm run preview
 ```
 
 ## 테스트
 
-```powershell
-npm.cmd test
+```bash
+npm test
 ```
 
 ## A동 GLB 내보내기
 
-```powershell
-npm.cmd run export:factory-a
+```bash
+npm run export:factory-a
 ```
 
 ## 기본 조작
@@ -148,14 +153,14 @@ webdt-campus/
 
 ## 설비 데이터 구조
 
-현재는 시설별 JavaScript 파일에 정의된 더미 데이터를 사용합니다. `equipmentDataRegistry.js`가 A동, B동, 유틸리티동, 물류동 데이터를 합쳐 설비 ID로 조회합니다.
+현재는 시설별 JavaScript 파일에 정의된 더미 데이터를 사용합니다. `equipmentDataRegistry.js`가 A동, B동, 유틸리티동, 물류동 데이터를 합치고, `equipmentStore.js`가 실행 중인 설비 상태를 관리합니다. 운영 KPI의 데모 기준값은 `siteKpiData.js`에 분리되어 있습니다.
 
 설비를 추가할 때는 다음 값이 반드시 일치해야 합니다.
 
 1. 3D 객체의 `equipmentId`
 2. 데이터 파일의 설비 `id`
 
-향후 중앙 상태 저장소를 추가하고 HTTP API와 WebSocket에서 받은 데이터를 이 저장소에 반영할 예정입니다.
+실제 데이터 연결 시 HTTP API와 WebSocket에서 받은 값을 설비 저장소와 KPI 데이터 공급부에 반영하도록 교체할 수 있습니다.
 
 ## 다음 개발 목표
 
@@ -169,7 +174,7 @@ webdt-campus/
 
 ## 배포 참고
 
-- 테스트 서버에는 `npm.cmd run build`로 생성한 `dist` 폴더의 내용을 업로드합니다.
+- 테스트 서버에는 `npm run build`로 생성한 `dist` 폴더의 내용을 업로드합니다.
 - `node_modules`와 로컬 환경 파일은 Git 또는 서버에 업로드하지 않습니다.
 - 외부 GLB, 이미지, 폰트는 배포 전에 라이선스와 출처를 확인해야 합니다.
 

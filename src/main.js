@@ -98,6 +98,10 @@ import {
 } from "./ui/siteControlPanel.js";
 
 import {
+  createCampusClock,
+} from "./ui/campusClock.js";
+
+import {
   createScenarioPanel,
 } from "./ui/scenarioPanel.js";
 
@@ -1099,6 +1103,19 @@ const siteControlPanel =
 
 
 /*
+ * 화면 상단 현재 날짜·시각
+ */
+const campusClock = createCampusClock({
+  dateElement: document.querySelector(
+    "#campus-clock-date",
+  ),
+  timeElement: document.querySelector(
+    "#campus-clock-time",
+  ),
+});
+
+
+/*
  * 마우스 시점 회전 컨트롤러
  */
 const dragLookController =
@@ -1177,8 +1194,10 @@ function updateSiteControlPanel(deltaSeconds) {
     return;
   }
 
+  const elapsedSeconds = sitePanelRefreshTimer;
+
   sitePanelRefreshTimer = 0;
-  siteControlPanel.update();
+  siteControlPanel.update(elapsedSeconds);
 }
 
 
@@ -1255,6 +1274,7 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
+  campusClock.update();
   graphicsQualityController.update();
   facilityLabelController.update();
 

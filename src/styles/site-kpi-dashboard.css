@@ -1,0 +1,149 @@
+/*
+ * 단지 통합 관제 패널 안의 운영 KPI 대시보드
+ */
+
+.site-kpi-dashboard {
+  display: grid;
+  gap: 8px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(49, 107, 119, 0.14);
+}
+
+.site-kpi-dashboard-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.site-kpi-dashboard-head > span {
+  color: #5fa79b;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.site-kpi-dashboard-head h3 {
+  margin: 0;
+  color: #2b525b;
+  font-size: 11px;
+}
+
+.site-kpi-dashboard-head small {
+  margin-left: auto;
+  color: #7f989d;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.site-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.site-kpi-card {
+  --kpi-color: #2f9e89;
+  position: relative;
+  min-width: 0;
+  padding: 9px;
+  overflow: hidden;
+  background: rgba(247, 251, 250, 0.9);
+  border: 1px solid rgba(48, 107, 116, 0.14);
+  border-radius: 8px;
+}
+
+.site-kpi-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--kpi-color);
+  content: "";
+}
+
+.site-kpi-card[data-kpi="production"] {
+  --kpi-color: #3c86ad;
+}
+
+.site-kpi-card[data-kpi="defect"] {
+  --kpi-color: #d08a2f;
+}
+
+.site-kpi-card[data-kpi="defect"][data-level="good"] {
+  --kpi-color: #38a77c;
+}
+
+.site-kpi-card[data-kpi="energy"] {
+  --kpi-color: #8063b4;
+}
+
+.site-kpi-card[data-level="warning"] {
+  background: rgba(255, 247, 232, 0.94);
+  border-color: rgba(208, 138, 47, 0.28);
+}
+
+.site-kpi-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.site-kpi-card-head span {
+  color: #55747b;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.site-kpi-card-head i {
+  width: 5px;
+  height: 5px;
+  background: var(--kpi-color);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--kpi-color) 14%, transparent);
+}
+
+.site-kpi-value {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-top: 5px;
+  color: #173f49;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.site-kpi-value small {
+  color: #6e898f;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.site-kpi-description {
+  min-height: 20px;
+  margin: 5px 0 0;
+  color: #7b9297;
+  font-size: 7px;
+  line-height: 1.4;
+}
+
+.site-kpi-progress {
+  display: block;
+  height: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+  background: rgba(54, 102, 110, 0.11);
+  border-radius: 999px;
+}
+
+.site-kpi-progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--kpi-color);
+  border-radius: inherit;
+  transition: width 300ms ease;
+}
