@@ -46,6 +46,11 @@ export const LOGISTICS_CAMPUS_LOOP = Object.freeze({
   southZ: loopRoadZ - logisticsCenterZ,
 
   /*
+   * 외곽도로 모서리와 출차 합류부에서 사용할 회전 반경.
+   */
+  cornerRadius: 32,
+
+  /*
    * 긴 외곽 순환 구간은 야드보다 조금 빠르게 주행한다.
    */
   speedMultiplier: 1.75,

@@ -58,6 +58,19 @@ export function createLogisticsRoute(plan) {
   const dockLabel = `${plan.dockNumber}번 도크`;
   const loopSpeed =
     plan.driveSpeed * LOGISTICS_CAMPUS_LOOP.speedMultiplier;
+  const {
+    eastX,
+    westX,
+    northZ,
+    southZ,
+    cornerRadius,
+  } = LOGISTICS_CAMPUS_LOOP;
+
+  const createLoopLeg = (x, z, zone) => ({
+    target: { x, z },
+    speed: loopSpeed,
+    zone,
+  });
 
   const standby = {
     x:
@@ -132,14 +145,30 @@ export function createLogisticsRoute(plan) {
       {
         target: {
           x: dockX,
-          z: LOGISTICS_YARD.exitLaneZ,
+          z: LOGISTICS_YARD.exitLaneZ - cornerRadius,
         },
         speed: plan.dockingSpeed * 1.6,
         zone: `${dockLabel} 출발`,
       },
       {
         target: {
-          x: LOGISTICS_YARD.exitGateX,
+          x: dockX + cornerRadius * 0.25,
+          z: LOGISTICS_YARD.exitLaneZ - cornerRadius * 0.25,
+        },
+        speed: plan.dockingSpeed * 1.6,
+        zone: `${dockLabel} 출차 레인 합류`,
+      },
+      {
+        target: {
+          x: dockX + cornerRadius,
+          z: LOGISTICS_YARD.exitLaneZ,
+        },
+        speed: plan.dockingSpeed * 1.6,
+        zone: `${dockLabel} 출차 레인 합류`,
+      },
+      {
+        target: {
+          x: LOGISTICS_YARD.exitGateX - cornerRadius,
           z: LOGISTICS_YARD.exitLaneZ,
         },
         speed: plan.driveSpeed,
@@ -147,57 +176,112 @@ export function createLogisticsRoute(plan) {
       },
       {
         target: {
-          x: LOGISTICS_YARD.exitGateX,
-          z: LOGISTICS_YARD.offsiteZ,
+          x: LOGISTICS_YARD.exitGateX - 14,
+          z: LOGISTICS_YARD.exitLaneZ + 4,
         },
         speed: plan.driveSpeed,
-        zone: "출차 게이트 통과",
+        zone: "출차 게이트 회전 구간",
+      },
+      {
+        target: {
+          x: LOGISTICS_YARD.exitGateX + 4,
+          z: LOGISTICS_YARD.exitLaneZ + 16,
+        },
+        speed: plan.driveSpeed,
+        zone: "출차 게이트 회전 구간",
+      },
+      {
+        target: {
+          x: eastX,
+          z: southZ - cornerRadius,
+        },
+        speed: plan.driveSpeed,
+        zone: "단지 동측 순환도로 진입",
         gateOut: true,
       },
     ],
 
     /*
-     * 남측 도로에서 출차한 뒤 동 → 북 → 서 → 남 순서로
-     * 단지 외곽을 한 바퀴 돌고 자신의 대기 위치로 돌아온다.
+     * 동측 연결로에서 남측도로로 완만하게 우회전한 뒤
+     * 남 → 서 → 북 → 동 → 남 순서로 외곽을 한 바퀴 돈다.
+     * 각 모서리에는 회전 반경을 둬 직각 이동과 U턴을 피한다.
      */
     circulating: [
-      {
-        target: {
-          x: LOGISTICS_CAMPUS_LOOP.eastX,
-          z: LOGISTICS_CAMPUS_LOOP.southZ,
-        },
-        speed: loopSpeed,
-        zone: "단지 남동측 순환도로",
-      },
-      {
-        target: {
-          x: LOGISTICS_CAMPUS_LOOP.eastX,
-          z: LOGISTICS_CAMPUS_LOOP.northZ,
-        },
-        speed: loopSpeed,
-        zone: "단지 동측 순환도로",
-      },
-      {
-        target: {
-          x: LOGISTICS_CAMPUS_LOOP.westX,
-          z: LOGISTICS_CAMPUS_LOOP.northZ,
-        },
-        speed: loopSpeed,
-        zone: "단지 북측 순환도로",
-      },
-      {
-        target: {
-          x: LOGISTICS_CAMPUS_LOOP.westX,
-          z: LOGISTICS_CAMPUS_LOOP.southZ,
-        },
-        speed: loopSpeed,
-        zone: "단지 서측 순환도로",
-      },
-      {
-        target: standby,
-        speed: loopSpeed,
-        zone: "단지 남측 순환도로",
-      },
+      createLoopLeg(
+        eastX - cornerRadius * 0.25,
+        southZ - cornerRadius * 0.25,
+        "남동측 도로 합류",
+      ),
+      createLoopLeg(
+        eastX - cornerRadius,
+        southZ,
+        "단지 남측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius,
+        southZ,
+        "단지 남측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius * 0.25,
+        southZ - cornerRadius * 0.25,
+        "단지 남서측 회전 구간",
+      ),
+      createLoopLeg(
+        westX,
+        southZ - cornerRadius,
+        "단지 서측 순환도로",
+      ),
+      createLoopLeg(
+        westX,
+        northZ + cornerRadius,
+        "단지 서측 순환도로",
+      ),
+      createLoopLeg(
+        westX + cornerRadius * 0.25,
+        northZ + cornerRadius * 0.25,
+        "단지 북서측 회전 구간",
+      ),
+      createLoopLeg(
+        westX + cornerRadius,
+        northZ,
+        "단지 북측 순환도로",
+      ),
+      createLoopLeg(
+        eastX - cornerRadius,
+        northZ,
+        "단지 북측 순환도로",
+      ),
+      createLoopLeg(
+        eastX - cornerRadius * 0.25,
+        northZ + cornerRadius * 0.25,
+        "단지 북동측 회전 구간",
+      ),
+      createLoopLeg(
+        eastX,
+        northZ + cornerRadius,
+        "단지 동측 순환도로",
+      ),
+      createLoopLeg(
+        eastX,
+        southZ - cornerRadius,
+        "단지 동측 순환도로",
+      ),
+      createLoopLeg(
+        eastX - cornerRadius * 0.25,
+        southZ - cornerRadius * 0.25,
+        "단지 남동측 회전 구간",
+      ),
+      createLoopLeg(
+        eastX - cornerRadius,
+        southZ,
+        "단지 남측 순환도로",
+      ),
+      createLoopLeg(
+        standby.x,
+        standby.z,
+        "물류센터 배차 대기열 복귀",
+      ),
     ],
   };
 }
