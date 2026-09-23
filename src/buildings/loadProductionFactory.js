@@ -27,13 +27,13 @@ function createDoorReference(group, index) {
 
   if (!panel || !opening || !statusLight) {
     throw new Error(
-      `A동 GLB에서 ${index}번 출입문 노드를 찾을 수 없습니다.`,
+      `모듈 조립동 GLB에서 ${index}번 출입문 노드를 찾을 수 없습니다.`,
     );
   }
 
   return {
     id: `A-DOOR-${String(index).padStart(2, "0")}`,
-    name: `A동 산업용 출입문 ${index}`,
+    name: `모듈 조립동 출입문 ${index}`,
     panel,
     statusLight,
     clickTargets: [
@@ -53,7 +53,7 @@ function addBuildingLabel(group, building) {
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>PRECISION MANUFACTURING · GLB</small>
+    <small>CELL INSPECTION · STACKING · WELDING · EOL</small>
   `;
 
   const label = new CSS2DObject(element);
@@ -96,7 +96,7 @@ export async function loadProductionFactory(
 
   if (!group) {
     throw new Error(
-      `A동 GLB에서 루트 노드를 찾을 수 없습니다: ${building.id}`,
+      `모듈 조립동 GLB에서 루트 노드를 찾을 수 없습니다: ${building.id}`,
     );
   }
 
@@ -120,7 +120,7 @@ export async function loadProductionFactory(
 
   if (!interior) {
     throw new Error(
-      "A동 GLB에서 내부 설비 그룹을 찾을 수 없습니다.",
+      "모듈 조립동 GLB에서 내부 설비 그룹을 찾을 수 없습니다.",
     );
   }
 

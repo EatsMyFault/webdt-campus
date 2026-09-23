@@ -10,10 +10,10 @@
 
     <meta
       name="description"
-      content="밝은 주간 환경의 스마트 공장 단지 디지털트윈"
+      content="카펙발레오 영천공장의 전기차 배터리 시스템 생산 공정을 담은 디지털 트윈"
     />
 
-    <title>Smart Factory Campus DT</title>
+    <title>카펙발레오 영천공장 디지털 트윈</title>
   </head>
 
   <body>
@@ -41,11 +41,11 @@
 
               <span>
                 <strong>단지 전체</strong>
-                <small>5개 주요 시설 통합 전경</small>
+                <small>5개 시설 통합 전경</small>
               </span>
             </button>
 
-            <!-- 생산 A동 -->
+            <!-- 모듈 조립동 -->
             <button
               type="button"
               data-viewpoint="factory-a"
@@ -55,18 +55,18 @@
               <kbd>1</kbd>
 
               <span>
-                <strong>생산 A동</strong>
-                <small>정밀가공 생산동</small>
+                <strong>모듈 조립동</strong>
+                <small>셀검사 → 모듈 EOL</small>
               </span>
             </button>
 
             <div
               id="factory-a-subviews"
               class="site-subviews factory-a-subviews"
-              aria-label="생산 A동 상세 시점"
+              aria-label="모듈 조립동 상세 시점"
               hidden
             >
-              <small>A동 상세 시점</small>
+              <small>모듈동 상세 시점</small>
 
               <button
                 type="button"
@@ -89,7 +89,7 @@
                 <b>02</b>
 
                 <span>
-                  <strong>산업용 출입구</strong>
+                  <strong>셀 반입 게이트</strong>
                   <small>도어 제어</small>
                 </span>
               </button>
@@ -102,8 +102,8 @@
                 <b>03</b>
 
                 <span>
-                  <strong>내부 생산라인</strong>
-                  <small>CNC 가공 셀</small>
+                  <strong>모듈 조립 라인</strong>
+                  <small>스태킹·레이저 용접·EOL</small>
                 </span>
               </button>
 
@@ -115,8 +115,8 @@
                 <b>04</b>
 
                 <span>
-                  <strong>집진·공압 지원실</strong>
-                  <small>환경·압축공기 설비</small>
+                  <strong>집진·공조 지원실</strong>
+                  <small>용접 흄 집진·제습 공조</small>
                 </span>
               </button>
 
@@ -129,12 +129,12 @@
 
                 <span>
                   <strong>설비 평면도</strong>
-                  <small>상부 설비 배치</small>
+                  <small>모듈 조립 설비 배치</small>
                 </span>
               </button>
             </div>
 
-            <!-- 생산 B동 -->
+            <!-- 팩 조립동 -->
             <button
               type="button"
               data-viewpoint="factory-b"
@@ -144,18 +144,18 @@
               <kbd>2</kbd>
 
               <span>
-                <strong>생산 B동</strong>
-                <small>스마트 자동조립</small>
+                <strong>팩 조립동</strong>
+                <small>트레이 → 팩 EOL</small>
               </span>
             </button>
 
             <div
               id="factory-b-subviews"
               class="site-subviews factory-b-subviews"
-              aria-label="생산 B동 상세 시점"
+              aria-label="팩 조립동 상세 시점"
               hidden
             >
-              <small>B동 상세 시점</small>
+              <small>팩동 상세 시점</small>
 
               <button
                 type="button"
@@ -178,8 +178,8 @@
                 <b>02</b>
 
                 <span>
-                  <strong>조립동 출입구</strong>
-                  <small>전면 생산 출입문</small>
+                  <strong>모듈 반입 게이트</strong>
+                  <small>전면 반입 출입문</small>
                 </span>
               </button>
 
@@ -191,8 +191,8 @@
                 <b>03</b>
 
                 <span>
-                  <strong>내부 자동조립</strong>
-                  <small>로봇 작업 셀</small>
+                  <strong>팩 조립 라인</strong>
+                  <small>모듈 장착·실링·기밀·EOL</small>
                 </span>
               </button>
 
@@ -205,7 +205,7 @@
 
                 <span>
                   <strong>설비 평면도</strong>
-                  <small>상부 조립라인 배치</small>
+                  <small>팩 조립 설비 배치</small>
                 </span>
               </button>
             </div>
@@ -221,7 +221,7 @@
 
               <span>
                 <strong>유틸리티</strong>
-                <small>전력·용수·냉각 공급</small>
+                <small>전력·냉각수·질소 공급</small>
               </span>
             </button>
 
@@ -241,8 +241,8 @@
                 <b>01</b>
 
                 <span>
-                  <strong>센터 전경</strong>
-                  <small>유틸리티 전체</small>
+                  <strong>플랜트 전경</strong>
+                  <small>유틸리티 플랜트 전체</small>
                 </span>
               </button>
 
@@ -268,7 +268,7 @@
 
                 <span>
                   <strong>옥외 설비 야드</strong>
-                  <small>탱크·냉각기·변압기</small>
+                  <small>냉각수·질소 탱크·변압기</small>
                 </span>
               </button>
 
@@ -286,7 +286,7 @@
               </button>
             </div>
 
-            <!-- 물류·출하 -->
+            <!-- 자재·출하 물류 -->
             <button
               type="button"
               data-viewpoint="logistics"
@@ -296,8 +296,8 @@
               <kbd>4</kbd>
 
               <span>
-                <strong>물류·출하</strong>
-                <small>입출고 물류센터</small>
+                <strong>자재·출하 물류</strong>
+                <small>셀 입고·완성 팩 출하</small>
               </span>
             </button>
 
@@ -331,7 +331,7 @@
 
                 <span>
                   <strong>상하차 도크</strong>
-                  <small>도크·트럭 대기장</small>
+                  <small>셀 입고·팩 출하 도크</small>
                 </span>
               </button>
 
@@ -344,7 +344,7 @@
 
                 <span>
                   <strong>내부 물류 운영</strong>
-                  <small>랙·피킹·포장 구역</small>
+                  <small>셀 보관·완성 팩 적재</small>
                 </span>
               </button>
 
@@ -357,12 +357,12 @@
 
                 <span>
                   <strong>물류 평면도</strong>
-                  <small>입고·보관·출하 배치</small>
+                  <small>셀 입고·보관·팩 출하 배치</small>
                 </span>
               </button>
             </div>
 
-            <!-- 통합운영 사무동 -->
+            <!-- 운영동 -->
             <button
               type="button"
               data-viewpoint="office"
@@ -371,8 +371,8 @@
               <kbd>5</kbd>
 
               <span>
-                <strong>통합운영 사무동</strong>
-                <small>관제·연구·업무 지원</small>
+                <strong>운영동</strong>
+                <small>생산관제·품질·업무 지원</small>
               </span>
             </button>
           </div>
@@ -401,7 +401,7 @@
             <header class="site-panel-head">
               <div>
                 <p>SITE CONTROL</p>
-                <h2 id="site-panel-title">단지 통합 관제</h2>
+                <h2 id="site-panel-title">영천공장 통합 관제</h2>
               </div>
 
               <small id="site-panel-updated">--:--:--</small>
@@ -467,6 +467,30 @@
             </section>
 
             <section
+              id="site-line-balance-section"
+              class="site-section"
+              hidden
+            >
+              <div class="site-section-head">
+                <span>LINE BALANCE</span>
+                <h3>라인 밸런싱</h3>
+                <strong id="site-takt-value">-</strong>
+              </div>
+
+              <p
+                id="site-takt-summary"
+                class="site-takt-summary"
+              >
+                -
+              </p>
+
+              <ul
+                id="site-balance-list"
+                class="site-balance-list"
+              ></ul>
+            </section>
+
+            <section
               id="site-logistics-section"
               class="site-section"
             >
@@ -507,15 +531,15 @@
             </section>
           </aside>
 
-          <!-- A동 출입문 제어 -->
+          <!-- 모듈 조립동 출입문 제어 -->
           <aside
             id="factory-door-panel"
             class="door-control-panel"
-            aria-label="A동 산업용 출입문 제어"
+            aria-label="모듈 조립동 출입문 제어"
             hidden
           >
             <p>DOOR CONTROL</p>
-            <h2>A동 산업용 출입문</h2>
+            <h2>모듈 조립동 출입문</h2>
 
             <div class="door-control-list">
               <section
@@ -588,15 +612,15 @@
             </small>
           </aside>
 
-          <!-- B동 출입문 제어 -->
+          <!-- 팩 조립동 출입문 제어 -->
           <aside
             id="factory-b-door-panel"
             class="door-control-panel factory-b-door-panel"
-            aria-label="B동 조립 출입문 제어"
+            aria-label="팩 조립동 출입문 제어"
             hidden
           >
             <p>DOOR CONTROL</p>
-            <h2>B동 조립 출입문</h2>
+            <h2>팩 조립동 출입문</h2>
 
             <div class="door-control-list">
               <section
@@ -824,11 +848,11 @@
           <strong>구역 범례</strong>
 
           <span class="factory-a">
-            생산 A동
+            모듈 조립동
           </span>
 
           <span class="factory-b">
-            생산 B동
+            팩 조립동
           </span>
 
           <span class="utility">
@@ -836,11 +860,11 @@
           </span>
 
           <span class="logistics">
-            물류·출하
+            자재·출하 물류
           </span>
 
           <span class="office">
-            통합운영동
+            운영동
           </span>
         </aside>
 
@@ -863,7 +887,7 @@
                   id="equipment-detail-site"
                   class="equipment-detail-eyebrow"
                 >
-                  A동 · 설비 상세정보
+                  모듈 조립동 · 설비 상세정보
                 </span>
 
                 <div>

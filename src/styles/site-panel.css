@@ -480,3 +480,71 @@
 .legend-panel .office::before {
   background: #9aadb8;
 }
+
+/*
+ * 라인 밸런싱.
+ *
+ * 가동률 목록과 같은 모양을 쓰되, 막대가 뜻하는 바가 다르다.
+ * 여기서는 목표 택트 대비 그 공정이 얼마나 차 있는지를 보여 주므로
+ * 막대가 길수록 여유가 없다. 병목이 가장 길다.
+ */
+.site-takt-summary {
+  margin: 0 0 10px;
+  color: #7e949a;
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-section-head > #site-takt-value {
+  margin-left: auto;
+  color: #26535c;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-balance-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-balance-list > li {
+  display: grid;
+  gap: 4px;
+}
+
+.site-balance-list .site-utilization-head strong::before {
+  background: #3c86ad;
+}
+
+.site-balance-list .site-utilization-bar b {
+  background: #3c86ad;
+}
+
+/*
+ * 목표 택트를 넘긴 공정은 설비가 모자라거나 멈춘 것이다.
+ * 라인이 그만큼 느려지므로 눈에 띄어야 한다.
+ */
+.site-balance-list > li[data-state="over"] .site-utilization-bar b {
+  background: #d0722f;
+}
+
+.site-balance-list > li[data-state="over"] em {
+  color: #b0762c;
+}
+
+.site-balance-flag {
+  padding: 1px 5px;
+  background: rgba(60, 134, 173, 0.16);
+  color: #2f6f92;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.site-balance-flag[hidden] {
+  display: none;
+}

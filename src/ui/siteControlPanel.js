@@ -17,6 +17,11 @@ import {
   hasFacilityKpi,
 } from "../data/facilityKpiData.js";
 
+import {
+  calculatePackLineBalance,
+  PACK_LINE_TARGET_TAKT_SECONDS,
+} from "../data/packLineBalance.js";
+
 const STATUS_KEYS = Object.freeze([
   "running",
   "warning",
@@ -101,6 +106,42 @@ function createEmptyAlertItem(message) {
   return item;
 }
 
+/*
+ * 라인 밸런싱 한 줄을 만든다.
+ *
+ * 막대는 목표 택트 대비 그 공정이 얼마나 차 있는지를 보여 준다.
+ * 병목은 막대가 가장 길고 표식이 붙는다.
+ */
+function createBalanceRow(bank) {
+  const item = document.createElement("li");
+  const head = document.createElement("div");
+  const name = document.createElement("strong");
+  const count = document.createElement("small");
+  const flag = document.createElement("mark");
+  const takt = document.createElement("em");
+  const bar = document.createElement("i");
+  const fill = document.createElement("b");
+
+  item.dataset.facility = "factory-b";
+  item.dataset.bank = bank.type;
+  head.className = "site-utilization-head";
+  bar.className = "site-utilization-bar";
+  flag.className = "site-balance-flag";
+  flag.textContent = "병목";
+  flag.hidden = true;
+  name.textContent = bank.label;
+
+  head.append(name, count, flag, takt);
+  bar.append(fill);
+  item.append(head, bar);
+
+  return { element: item, count, flag, takt, fill };
+}
+
+function formatTakt(seconds) {
+  return Number.isFinite(seconds) ? `${seconds.toFixed(1)}초` : "정지";
+}
+
 export function createSiteControlPanel({
   root,
   equipment,
@@ -126,6 +167,12 @@ export function createSiteControlPanel({
   const logisticsSection = root.querySelector(
     "#site-logistics-section",
   );
+  const balanceSection = root.querySelector(
+    "#site-line-balance-section",
+  );
+  const balanceList = root.querySelector("#site-balance-list");
+  const taktValue = root.querySelector("#site-takt-value");
+  const taktSummary = root.querySelector("#site-takt-summary");
   const alertList = root.querySelector("#site-alert-list");
   const alertCount = root.querySelector("#site-alert-count");
   const kpiDashboard = createSiteKpiDashboard({
@@ -250,6 +297,58 @@ export function createSiteControlPanel({
     );
   }
 
+  /*
+   * 라인 밸런싱은 지금 돌아가는 설비만으로 다시 계산한다.
+   * 설비가 멈추면 그 뱅크가 느려지고 병목이 옮겨 가기도 한다.
+   * 화면에서 그 변화를 바로 볼 수 있어야 한다.
+   */
+  let balanceRows = [];
+
+  function renderLineBalance() {
+    /* 설비의 현재 상태를 덮어 실시간 밸런싱을 구한다 */
+    const balance = calculatePackLineBalance(
+      equipment.map((item) => ({
+        ...item,
+        status: resolveStatus(item),
+      })),
+      { onlyAvailable: true },
+    );
+
+    if (balanceRows.length !== balance.banks.length) {
+      balanceRows = balance.banks.map(createBalanceRow);
+      balanceList.replaceChildren(
+        ...balanceRows.map((row) => row.element),
+      );
+    }
+
+    taktValue.textContent = formatTakt(balance.taktSeconds);
+    taktSummary.textContent =
+      `병목 ${balance.bottleneck.label} · ` +
+      `스테이션 ${balance.stationCount}대 · ` +
+      `목표 ${PACK_LINE_TARGET_TAKT_SECONDS}초`;
+
+    balance.banks.forEach((bank, index) => {
+      const row = balanceRows[index];
+      const isBottleneck = bank.type === balance.bottleneck.type;
+      const isOverTarget =
+        !Number.isFinite(bank.effectiveTaktSeconds) ||
+        bank.effectiveTaktSeconds > PACK_LINE_TARGET_TAKT_SECONDS;
+
+      row.element.dataset.state = isOverTarget ? "over" : "normal";
+      row.count.textContent =
+        `${bank.availableCount}/${bank.machineCount}대 · ` +
+        `사이클 ${bank.slowestSeconds.toFixed(1)}초`;
+      row.takt.textContent = formatTakt(bank.effectiveTaktSeconds);
+      row.flag.hidden = !isBottleneck;
+
+      const ratio = Number.isFinite(bank.effectiveTaktSeconds)
+        ? (bank.effectiveTaktSeconds / PACK_LINE_TARGET_TAKT_SECONDS) * 100
+        : 100;
+
+      row.fill.style.width = `${Math.min(Math.max(ratio, 0), 100)}%`;
+    });
+  }
+
   function readLogisticsSummary() {
     const summary = getLogisticsSummary?.() ?? {
       handlingTrucks: 0,
@@ -265,6 +364,10 @@ export function createSiteControlPanel({
   }
 
   function update(elapsedSeconds = 0) {
+    if (!balanceSection.hidden) {
+      renderLineBalance();
+    }
+
     const counts = {
       running: 0,
       warning: 0,
@@ -390,6 +493,13 @@ export function createSiteControlPanel({
 
     if (showKpi) {
       kpiDashboard.setFacility(facility.id, facility.label);
+    }
+
+    /* 라인 밸런싱은 팩 조립동 전용이다 */
+    balanceSection.hidden = facility?.id !== "factory-b";
+
+    if (!balanceSection.hidden) {
+      renderLineBalance();
     }
 
     logisticsSection.hidden = facility?.id !== "logistics";

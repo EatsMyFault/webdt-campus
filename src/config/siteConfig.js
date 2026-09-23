@@ -1,7 +1,7 @@
 /*
  * 부지 치수.
  *
- * 구역이 원점 대칭이 아니라 북쪽(사무동)으로 더 뻗어 있어
+ * 구역이 원점 대칭이 아니라 북쪽(운영동)으로 더 뻗어 있어
  * 부지도 정사각형이 아니다. centerZ 는 부지 사각형의 중심이
  * 원점에서 얼마나 북쪽에 있는지를 나타낸다.
  *
@@ -33,7 +33,7 @@ export const SITE = Object.freeze({
 export const SITE_ZONES = Object.freeze([
   {
     id: "factory-a",
-    label: "정밀가공 생산 A동 구역",
+    label: "모듈 조립동 구역",
     position: [-300, -220],
     size: [520, 360],
     color: 0x86c5b7,
@@ -43,7 +43,7 @@ export const SITE_ZONES = Object.freeze([
   },
   {
     id: "factory-b",
-    label: "스마트 조립 생산 B동 구역",
+    label: "팩 조립동 구역",
     position: [300, -220],
     size: [520, 360],
     color: 0x85b9d3,
@@ -53,7 +53,7 @@ export const SITE_ZONES = Object.freeze([
   },
   {
     id: "utility",
-    label: "통합 유틸리티 센터",
+    label: "유틸리티 플랜트 구역",
     position: [-300, 220],
     size: [520, 360],
     color: 0xb7a4d8,
@@ -63,7 +63,7 @@ export const SITE_ZONES = Object.freeze([
   },
   {
     id: "logistics",
-    label: "물류·출하 예정 부지",
+    label: "자재·출하 물류 구역",
     position: [300, 220],
     size: [520, 360],
     color: 0xe5b875,
@@ -73,7 +73,7 @@ export const SITE_ZONES = Object.freeze([
   },
   {
     id: "office",
-    label: "통합운영 사무동 구역",
+    label: "운영동 구역",
     position: [260, -478],
     size: [520, 140],
     color: 0x9aadb8,

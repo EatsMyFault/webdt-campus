@@ -13,15 +13,15 @@
 
 export const UTILITY_FLOW_DATA = [
   /*
-   * 공정용수 배관
+   * 냉각수 배관
    */
   {
     id: "FLOW-WATER-01",
-    name: "공정용수 공급 라인",
+    name: "냉각수 공급 라인",
     equipmentId: "TANK-UT-01",
 
-    medium: "water",
-    mediumLabel: "공정용수",
+    medium: "coolant",
+    mediumLabel: "냉각수",
 
     status: "running",
 
@@ -61,8 +61,8 @@ export const UTILITY_FLOW_DATA = [
     nominalFlowRate: 120,
     unit: "Nm³/min",
 
-    color: 0x29b87d,
-    emissiveColor: 0x54efac,
+    color: 0x8fa3b0,
+    emissiveColor: 0xc9dae4,
 
     markerCount: 14,
     markerRadius: 0.48,
@@ -77,24 +77,24 @@ export const UTILITY_FLOW_DATA = [
   },
 
     /*
-   * 축열수 배관
+   * 질소 배관
    */
   {
-    id: "FLOW-THERMAL-01",
-    name: "축열수 공급 라인",
+    id: "FLOW-NITROGEN-01",
+    name: "질소 공급 라인",
     equipmentId: "TANK-UT-03",
 
-    medium: "thermal-water",
-    mediumLabel: "축열수",
+    medium: "nitrogen",
+    mediumLabel: "질소",
 
     status: "running",
 
     flowRate: 118.5,
     nominalFlowRate: 150,
-    unit: "m³/h",
+    unit: "Nm³/h",
 
-    color: 0xe99a2d,
-    emissiveColor: 0xffc467,
+    color: 0x29b87d,
+    emissiveColor: 0x54efac,
 
     markerCount: 16,
     markerRadius: 0.52,

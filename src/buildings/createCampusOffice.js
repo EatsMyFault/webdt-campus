@@ -421,7 +421,7 @@ function addBuildingLabel(
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>SMART CAMPUS CONTROL · R&amp;D</small>
+    <small>PRODUCTION CONTROL · QUALITY</small>
   `;
 
   const label = new CSS2DObject(element);

@@ -833,7 +833,7 @@ export function createLogisticsOperationController({
     return {
       ...base,
       status: truckState.status,
-      location: `물류·출하 센터 · ${truckState.zone}`,
+      location: `자재·출하 물류센터 · ${truckState.zone}`,
 
       metrics: [
         {
