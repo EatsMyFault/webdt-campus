@@ -1,5 +1,21 @@
 import * as THREE from "three";
 
+/*
+ * 이 시점에서 우클릭 평행 이동을 화면 기준으로 해야 하는지 판단한다.
+ *
+ * 2D 평면 시점은 카메라가 수직으로 내려다보느라 camera.up 이 수평이다.
+ * 이때 지면 기준 패닝(screenSpacePanning = false)을 쓰면 OrbitControls 가
+ * 세로 드래그 방향을 up × right = 월드 Y축으로 계산해,
+ * 카메라가 위아래로 밀리면서 확대/축소처럼 보인다.
+ *
+ * up 이 수직이 아니면 화면 기준 패닝으로 바꿔 지면 위를 훑게 한다.
+ */
+export function needsScreenSpacePanning(viewpoint) {
+  const up = viewpoint?.up ?? [0, 1, 0];
+
+  return Math.abs(up[1] ?? 1) < 0.5;
+}
+
 function easeInOutCubic(value) {
   return value < 0.5
     ? 4 * value ** 3
@@ -60,6 +76,12 @@ export function createCameraViewController({
     endFov = viewpoint.fov ?? defaultFov;
     activeViewId = viewId;
     elapsed = 0;
+
+    /*
+     * 패닝 기준은 camera.up 과 함께 바뀌어야 한다.
+     * 전환 중에는 controls 가 꺼져 있어 지금 정해 두면 된다.
+     */
+    controls.screenSpacePanning = needsScreenSpacePanning(viewpoint);
 
     onViewChange?.(viewpoint);
 

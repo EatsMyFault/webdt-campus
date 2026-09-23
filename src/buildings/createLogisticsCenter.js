@@ -757,7 +757,7 @@ function addBuildingLabel(group, building) {
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>WAREHOUSE · SHIPPING · DOCK</small>
+    <small>CELL INBOUND · PACK SHIPPING · DOCK</small>
   `;
 
   const label = new CSS2DObject(element);

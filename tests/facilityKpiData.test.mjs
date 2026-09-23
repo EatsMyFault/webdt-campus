@@ -77,7 +77,7 @@ test("건물마다 서로 다른 KPI 카드 네 장을 만든다", () => {
   assert.notEqual(cardIds[2], cardIds[3]);
 
   /*
-   * 생산 A동과 B동은 같은 지표를 쓴다.
+   * 모듈 조립동과 팩 조립동은 같은 지표를 쓴다.
    */
   assert.equal(cardIds[0], cardIds[1]);
 });

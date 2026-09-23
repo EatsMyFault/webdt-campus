@@ -28,32 +28,32 @@ const TYPE_VIEW = {
 
 const FLOW_VIEW = {
   "TANK-UT-01": {
-    source: "정수 처리 설비",
-    destination: "A·B동 공정용수",
+    source: "냉각수 처리 설비",
+    destination: "모듈동·팩동 냉각수",
   },
   "TANK-UT-02": {
     source: "공기 압축 설비",
-    destination: "생산동 공압 설비",
+    destination: "조립동 공압 설비",
   },
   "TANK-UT-03": {
-    source: "냉각 계통 환수",
-    destination: "공정 냉각 계통",
+    source: "질소 발생 설비",
+    destination: "레이저 용접 보호가스",
   },
   "CHILLER-UT-01": {
-    source: "생산동 냉각수 환수",
-    destination: "A동 냉수 공급",
+    source: "조립동 냉각수 환수",
+    destination: "모듈동 냉수 공급",
   },
   "CHILLER-UT-02": {
-    source: "생산동 냉각수 환수",
-    destination: "B동 냉수 공급",
+    source: "조립동 냉각수 환수",
+    destination: "팩동 냉수 공급",
   },
   "TR-UT-01": {
     source: "22.9 kV 수전 계통",
-    destination: "A동·공용 전력",
+    destination: "모듈동·공용 전력",
   },
   "TR-UT-02": {
     source: "22.9 kV 수전 계통",
-    destination: "B동·냉각 설비",
+    destination: "팩동·충방전 설비",
   },
 };
 

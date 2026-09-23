@@ -1,11 +1,11 @@
-import { FACTORY_A_EQUIPMENT } from "./factoryAEquipmentData.js";
-import { FACTORY_B_EQUIPMENT } from "./factoryBEquipmentData.js";
+import { MODULE_ASSEMBLY_EQUIPMENT } from "./moduleAssemblyEquipmentData.js";
+import { PACK_ASSEMBLY_EQUIPMENT } from "./packAssemblyEquipmentData.js";
 import { UTILITY_EQUIPMENT } from "./utilityEquipmentData.js";
 import { LOGISTICS_EQUIPMENT } from "./logisticsEquipmentData.js";
 
 export const EQUIPMENT_DATA = [
-  ...FACTORY_A_EQUIPMENT,
-  ...FACTORY_B_EQUIPMENT,
+  ...MODULE_ASSEMBLY_EQUIPMENT,
+  ...PACK_ASSEMBLY_EQUIPMENT,
   ...UTILITY_EQUIPMENT,
   ...LOGISTICS_EQUIPMENT,
 ];

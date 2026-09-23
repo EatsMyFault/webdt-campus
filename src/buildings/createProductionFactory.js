@@ -299,7 +299,7 @@ function createIndustrialDoor({
 
   return {
     id: `A-DOOR-${String(index + 1).padStart(2, "0")}`,
-    name: `A동 산업용 출입문 ${index + 1}`,
+    name: `모듈 조립동 출입문 ${index + 1}`,
     panel,
     statusLight,
     clickTargets,
@@ -549,7 +549,7 @@ function addBuildingLabel(group, building) {
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>PRECISION MANUFACTURING</small>
+    <small>CELL INSPECTION · STACKING · WELDING · EOL</small>
   `;
 
   const label = new CSS2DObject(element);

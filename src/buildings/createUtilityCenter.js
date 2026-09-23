@@ -659,7 +659,7 @@ function addBuildingLabel(group, building) {
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>POWER · WATER · AIR · COOLING</small>
+    <small>POWER · COOLANT · AIR · NITROGEN</small>
   `;
 
   const label = new CSS2DObject(element);

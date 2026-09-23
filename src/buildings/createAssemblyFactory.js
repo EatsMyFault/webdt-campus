@@ -362,7 +362,7 @@ function addAssemblyDoors(group, materials) {
 
     doors.push({
       id: `B-DOOR-${String(doorIndex + 1).padStart(2, "0")}`,
-      name: `B동 조립 출입문 ${doorIndex + 1}`,
+      name: `팩 조립동 출입문 ${doorIndex + 1}`,
       panel,
       statusLight,
       clickTargets,
@@ -459,7 +459,7 @@ function addBuildingLabel(group, building) {
   element.innerHTML = `
     <span>${building.code}</span>
     <strong>${building.name}</strong>
-    <small>SMART ASSEMBLY CENTER</small>
+    <small>TRAY · MODULE MOUNTING · SEALING · PACK EOL</small>
   `;
 
   const label = new CSS2DObject(element);

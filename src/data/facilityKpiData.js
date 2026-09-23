@@ -6,7 +6,7 @@
  * 핵심 지표라 건물마다 지표 구성 자체가 다르다.
  *
  * 값은 모두 데모용 더미 데이터다.
- * 생산 A·B동의 생산량·불량·에너지 합계는 siteKpiData.js의
+ * 모듈동·팩동의 생산량·불량·에너지 합계는 siteKpiData.js의
  * 단지 합계(SITE_KPI_BASE)와 맞춰 두었다.
  */
 
@@ -96,10 +96,11 @@ function createUtilizationSnapshot(statusCounts, previousRate) {
 
 
 /*
- * 생산 A·B동: 가동률 · 생산량 · 불량률 · 에너지
+ * 모듈 조립동·팩 조립동: 가동률 · 생산량 · 직행률 · 에너지
  */
 const PRODUCTION_BASES = Object.freeze({
   "factory-a": Object.freeze({
+    productionLabel: "모듈 생산량",
     previousUtilizationRate: 88.9,
 
     production: Object.freeze({
@@ -123,6 +124,7 @@ const PRODUCTION_BASES = Object.freeze({
   }),
 
   "factory-b": Object.freeze({
+    productionLabel: "팩 생산량",
     previousUtilizationRate: 64.1,
 
     production: Object.freeze({
@@ -150,13 +152,30 @@ function createProductionTracker(facilityId) {
   const base = PRODUCTION_BASES[facilityId];
   const tracker = createSiteKpiTracker(base);
 
+  /*
+   * 배터리 공정은 불량률보다 직행률을 본다.
+   * 재작업 없이 한 번에 통과한 비율이라 EOL 재시험이 늘면 바로 떨어진다.
+   */
+  function toFirstTimeThrough(defect) {
+    const value = 100 - defect.value;
+    const target = 100 - defect.targetRate;
+
+    return {
+      value,
+      target,
+      progress: clamp((value / target) * 100, 0, 100),
+    };
+  }
+
   function toCards(snapshot) {
+    const firstTimeThrough = toFirstTimeThrough(snapshot.defect);
+
     return [
       createUtilizationCard(snapshot.utilization),
 
       {
         id: "production",
-        label: "생산량",
+        label: base.productionLabel ?? "생산량",
         unit: "EA",
         valueText: formatNumber(snapshot.production.value),
         description:
@@ -167,16 +186,16 @@ function createProductionTracker(facilityId) {
       },
 
       {
-        id: "defect",
-        label: "불량률",
+        id: "first-time-through",
+        label: "직행률",
         unit: "%",
-        valueText: snapshot.defect.value.toFixed(2),
+        valueText: firstTimeThrough.value.toFixed(2),
         description:
-          `불량 ${formatNumber(snapshot.defect.count)}건 · ` +
-          `목표 ${snapshot.defect.targetRate.toFixed(2)}% 이하`,
-        progress: snapshot.defect.progress,
+          `재작업 ${formatNumber(snapshot.defect.count)}건 · ` +
+          `목표 ${firstTimeThrough.target.toFixed(2)}% 이상`,
+        progress: firstTimeThrough.progress,
         level:
-          snapshot.defect.value <= snapshot.defect.targetRate
+          firstTimeThrough.value >= firstTimeThrough.target
             ? "good"
             : "warning",
       },
@@ -212,7 +231,7 @@ function createProductionTracker(facilityId) {
 
 
 /*
- * 유틸리티 센터: 가동률 · 수전 전력 · 용수 · 압축공기 압력
+ * 유틸리티 플랜트: 가동률 · 수전 전력 · 냉각수 · 압축공기 압력
  */
 const UTILITY_BASE = Object.freeze({
   previousUtilizationRate: 96.4,
@@ -287,7 +306,7 @@ function createUtilityTracker() {
 
       {
         id: "water",
-        label: "공정용수 사용량",
+        label: "냉각수 사용량",
         unit: "t",
         valueText: formatNumber(consumedTon, 1),
         description:
@@ -330,7 +349,7 @@ function createUtilityTracker() {
 
 
 /*
- * 물류·출하 센터: 가동률 · 입출고 처리 · 도크 점유 · 구내 운행
+ * 자재·출하 물류센터: 가동률 · 입출고 처리 · 도크 점유 · 구내 운행
  *
  * 도크와 트럭은 누적값이 아니라 운행 컨트롤러의 실시간 집계를 쓴다.
  */

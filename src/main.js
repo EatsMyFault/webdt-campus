@@ -71,6 +71,19 @@ import {
 } from "./animations/pipeFlowController.js";
 
 import {
+  createPackConveyorController,
+} from "./animations/packConveyorController.js";
+
+import {
+  PACK_CONVEYOR_PATH,
+  PACK_CONVEYOR_STATIONS,
+} from "./interiors/createFactoryBInterior.js";
+
+import {
+  PACK_LINE_TAKT_SECONDS,
+} from "./data/packLineBalance.js";
+
+import {
   createLogisticsOperationController,
 } from "./animations/logisticsOperationController.js";
 
@@ -293,6 +306,37 @@ const equipmentStatusVisualController =
   createEquipmentStatusVisualController({
     roots: [factory.interior],
     store: equipmentStore,
+  });
+
+/*
+ * 팩 조립동 ㄷ자 컨베이어 운행.
+ * 설비 상태가 멈춤으로 바뀌면 벨트도 함께 선다.
+ */
+const packConveyorController =
+  createPackConveyorController({
+    parent: factoryB.interior,
+    path: PACK_CONVEYOR_PATH,
+    stations: PACK_CONVEYOR_STATIONS,
+    taktSeconds: PACK_LINE_TAKT_SECONDS,
+
+    /*
+     * 팩 운행 시뮬레이션이 설비의 현재 상태를 그대로 본다.
+     * 설비가 멈추면 그 자리는 못 쓰는 창구가 되어
+     * 앞 공정에 팩이 밀리기 시작한다.
+     */
+    getStationState(stationId) {
+      const equipment = equipmentStore.getEquipmentById(stationId);
+
+      return {
+        type: equipment?.type,
+        cycleSeconds: equipment?.production?.cycleSeconds ?? 60,
+        available:
+          equipment?.status !== "idle" && equipment?.status !== "stopped",
+      };
+    },
+
+    equipmentId: "CNV-PA-01",
+    equipmentStore,
   });
 
 /*
@@ -1281,6 +1325,10 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
+  packConveyorController.update(
+    deltaSeconds,
+  );
+
   logisticsOperationController.update(
     deltaSeconds,
   );
@@ -1411,6 +1459,7 @@ window.addEventListener(
     equipmentDetailPanel.destroy();
     facilityLabelController.destroy();
     pipeFlowController.destroy();
+    packConveyorController.destroy();
     logisticsOperationController.destroy();
     equipmentStatusVisualController.destroy();
     siteControlPanel.destroy();
