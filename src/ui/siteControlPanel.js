@@ -18,9 +18,29 @@ import {
 } from "../data/facilityKpiData.js";
 
 import {
-  calculatePackLineBalance,
-  PACK_LINE_TARGET_TAKT_SECONDS,
-} from "../data/packLineBalance.js";
+  calculateLineBalance,
+  createStationStateReader,
+  LINE_TARGET_TAKT_SECONDS,
+} from "../data/lineBalance.js";
+
+import {
+  MODULE_CONVEYOR_STATIONS,
+} from "../interiors/createFactoryAInterior.js";
+
+import {
+  PACK_CONVEYOR_STATIONS,
+} from "../interiors/createFactoryBInterior.js";
+
+/*
+ * 라인 밸런싱을 보여 줄 건물과 그 라인의 스테이션 순서.
+ *
+ * 뱅크는 라인 순서대로 연속한 같은 설비를 묶어서 나오므로
+ * 여기 순서가 곧 공정 순서다.
+ */
+const LINE_STATIONS = Object.freeze({
+  "factory-a": MODULE_CONVEYOR_STATIONS,
+  "factory-b": PACK_CONVEYOR_STATIONS,
+});
 
 const STATUS_KEYS = Object.freeze([
   "running",
@@ -122,7 +142,6 @@ function createBalanceRow(bank) {
   const bar = document.createElement("i");
   const fill = document.createElement("b");
 
-  item.dataset.facility = "factory-b";
   item.dataset.bank = bank.type;
   head.className = "site-utilization-head";
   bar.className = "site-utilization-bar";
@@ -303,18 +322,31 @@ export function createSiteControlPanel({
    * 화면에서 그 변화를 바로 볼 수 있어야 한다.
    */
   let balanceRows = [];
+  let renderedBalanceKey = null;
 
   function renderLineBalance() {
+    const stations = LINE_STATIONS[activeFacility?.id];
+
+    if (!stations) return;
+
     /* 설비의 현재 상태를 덮어 실시간 밸런싱을 구한다 */
-    const balance = calculatePackLineBalance(
-      equipment.map((item) => ({
-        ...item,
-        status: resolveStatus(item),
-      })),
+    const balance = calculateLineBalance(
+      stations,
+      createStationStateReader(
+        equipment.map((item) => ({
+          ...item,
+          status: resolveStatus(item),
+        })),
+      ),
       { onlyAvailable: true },
     );
 
-    if (balanceRows.length !== balance.banks.length) {
+    const signature = balance.banks
+      .map((bank) => bank.type)
+      .join("|");
+
+    if (signature !== renderedBalanceKey) {
+      renderedBalanceKey = signature;
       balanceRows = balance.banks.map(createBalanceRow);
       balanceList.replaceChildren(
         ...balanceRows.map((row) => row.element),
@@ -325,14 +357,14 @@ export function createSiteControlPanel({
     taktSummary.textContent =
       `병목 ${balance.bottleneck.label} · ` +
       `스테이션 ${balance.stationCount}대 · ` +
-      `목표 ${PACK_LINE_TARGET_TAKT_SECONDS}초`;
+      `목표 ${LINE_TARGET_TAKT_SECONDS}초`;
 
     balance.banks.forEach((bank, index) => {
       const row = balanceRows[index];
       const isBottleneck = bank.type === balance.bottleneck.type;
       const isOverTarget =
         !Number.isFinite(bank.effectiveTaktSeconds) ||
-        bank.effectiveTaktSeconds > PACK_LINE_TARGET_TAKT_SECONDS;
+        bank.effectiveTaktSeconds > LINE_TARGET_TAKT_SECONDS;
 
       row.element.dataset.state = isOverTarget ? "over" : "normal";
       row.count.textContent =
@@ -342,7 +374,7 @@ export function createSiteControlPanel({
       row.flag.hidden = !isBottleneck;
 
       const ratio = Number.isFinite(bank.effectiveTaktSeconds)
-        ? (bank.effectiveTaktSeconds / PACK_LINE_TARGET_TAKT_SECONDS) * 100
+        ? (bank.effectiveTaktSeconds / LINE_TARGET_TAKT_SECONDS) * 100
         : 100;
 
       row.fill.style.width = `${Math.min(Math.max(ratio, 0), 100)}%`;
@@ -495,8 +527,8 @@ export function createSiteControlPanel({
       kpiDashboard.setFacility(facility.id, facility.label);
     }
 
-    /* 라인 밸런싱은 팩 조립동 전용이다 */
-    balanceSection.hidden = facility?.id !== "factory-b";
+    /* 라인 밸런싱은 컨베이어 라인이 있는 생산동에서만 보여 준다 */
+    balanceSection.hidden = !LINE_STATIONS[facility?.id];
 
     if (!balanceSection.hidden) {
       renderLineBalance();

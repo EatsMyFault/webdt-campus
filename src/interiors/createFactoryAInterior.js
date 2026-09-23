@@ -3,13 +3,14 @@ import * as THREE from "three";
 /*
  * 모듈 조립동(MA-01) 내부.
  *
- * 설비는 공정 순서대로 서쪽에서 동쪽으로 흐르게 놓았다.
+ * 팩 조립동과 같은 ㄷ자 라인이다.
+ * 벨트 양옆에 설비를 바짝 붙여 세우고, 모듈은 벨트에 실린 채로
+ * 스테이션을 차례로 지난다.
  *
  *   z = -105  셀 보관 랙
- *   z =  -70  1공정 셀 수입검사 → 2공정 셀 스태킹
- *   z =  -47  공정 간 이송 컨베이어
- *   z =  -25  3공정 버스바 레이저 용접
- *   z =   30  4공정 모듈 EOL 검사
+ *   z =  -62  상단 벨트 · 1공정 셀 수입검사 → 2공정 셀 스태킹
+ *   x = -140  서쪽 세로 구간
+ *   z =   38  하단 벨트 · 3공정 레이저 용접 → 4공정 모듈 EOL
  *   x < -158  집진·공조 지원실 (별동)
  *
  * 여기서 만드는 equipmentId 는 moduleAssemblyEquipmentData.js 의
@@ -189,11 +190,18 @@ function addStatusPole(machine, materials, status, position) {
   machine.add(pole, lamp);
 }
 
-function createMachineGroup({ id, type, position, status }) {
+function createMachineGroup({
+  id,
+  type,
+  position,
+  rotationY = 0,
+  status,
+}) {
   const machine = new THREE.Group();
 
   machine.name = id;
   machine.position.set(...position);
+  machine.rotation.y = rotationY;
   machine.userData = {
     equipmentId: id,
     equipmentType: type,
@@ -209,11 +217,12 @@ function createMachineGroup({ id, type, position, status }) {
  *
  * 셀을 트레이째 밀어 넣어 전압과 내부저항을 재는 낮은 부스다.
  */
-function createCellInspector({ id, position, materials, status }) {
+function createCellInspector({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "cell-inspector",
     position,
+    rotationY,
     status,
   });
 
@@ -282,11 +291,12 @@ function createCellInspector({ id, position, materials, status }) {
  * 셀과 용접부를 지나가며 찍는 게이트형 설비라
  * 두 공정이 같은 모양을 함께 쓴다.
  */
-function createVisionInspector({ id, position, materials, status }) {
+function createVisionInspector({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "vision-inspector",
     position,
+    rotationY,
     status,
   });
 
@@ -351,11 +361,12 @@ function createVisionInspector({ id, position, materials, status }) {
  *
  * 네 기둥 사이에서 상부 헤드가 내려와 적층한 셀을 눌러 준다.
  */
-function createStackingCell({ id, position, materials, status }) {
+function createStackingCell({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "stacking-cell",
     position,
+    rotationY,
     status,
   });
 
@@ -422,11 +433,12 @@ function createStackingCell({ id, position, materials, status }) {
  *
  * 레이저는 밀폐 캐빈 안에서만 쏘고, 흄은 바로 위 덕트로 뽑는다.
  */
-function createLaserWelder({ id, position, materials, status }) {
+function createLaserWelder({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "laser-welder",
     position,
+    rotationY,
     status,
   });
 
@@ -512,11 +524,12 @@ function createLaserWelder({ id, position, materials, status }) {
  * 채널 캐비닛이 나란히 서 있고 위로 굵은 전력 케이블 트레이가 지난다.
  * 단지에서 전력을 가장 많이 먹는 설비다.
  */
-function createModuleEolTester({ id, position, materials, status }) {
+function createModuleEolTester({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "module-eol-tester",
     position,
+    rotationY,
     status,
   });
 
@@ -576,11 +589,12 @@ function createModuleEolTester({ id, position, materials, status }) {
  *
  * 고전압을 걸기 때문에 시험 중에는 부스 문이 잠긴다.
  */
-function createHipotTester({ id, position, materials, status }) {
+function createHipotTester({ id, position, rotationY = 0, materials, status }) {
   const machine = createMachineGroup({
     id,
     type: "hipot-tester",
     position,
+    rotationY,
     status,
   });
 
@@ -638,11 +652,12 @@ function createHipotTester({ id, position, materials, status }) {
 /*
  * 지원실 · 용접 흄 집진기
  */
-function createDustCollector({ id, position, materials, status }) {
+function createDustCollector({ id, position, rotationY = 0, materials, status }) {
   const equipment = createMachineGroup({
     id,
     type: "dust-collector",
     position,
+    rotationY,
     status,
   });
 
@@ -700,11 +715,12 @@ function createDustCollector({ id, position, materials, status }) {
  *
  * 셀 단자가 산화하지 않도록 적층 구간의 노점을 낮춘다.
  */
-function createDehumidifier({ id, position, materials, status }) {
+function createDehumidifier({ id, position, rotationY = 0, materials, status }) {
   const equipment = createMachineGroup({
     id,
     type: "dehumidifier",
     position,
+    rotationY,
     status,
   });
 
@@ -760,11 +776,12 @@ function createDehumidifier({ id, position, materials, status }) {
 /*
  * 지원실 · 공기압축기
  */
-function createAirCompressor({ id, position, materials, status }) {
+function createAirCompressor({ id, position, rotationY = 0, materials, status }) {
   const equipment = createMachineGroup({
     id,
     type: "air-compressor",
     position,
+    rotationY,
     status,
   });
 
@@ -816,18 +833,38 @@ function createAirCompressor({ id, position, materials, status }) {
 
 
 /*
- * 공정 라인 배치.
+ * 공정 스테이션 배치.
  *
- * 한 행에 여섯 대씩 같은 간격으로 놓아 2D 평면 시점에서도
- * 공정 순서가 그대로 읽히게 한다.
+ * 팩 조립동과 같은 방식이다. ㄷ자 벨트를 놓고 설비를 양옆에 바짝 붙여
+ * 세운 뒤, 작업면이 벨트를 보도록 돌린다. 모듈은 벨트에 실린 채로
+ * 스테이션을 차례로 지난다.
+ *
+ * 세로 구간은 서쪽에 둔다. 동쪽은 배전반이 붙어 있고,
+ * 서쪽은 집진·공조 지원실과 겹치지 않을 만큼만 띄웠다.
+ *
+ * 같은 공정을 여러 대가 나눠 맡는 병렬 뱅크는 나란히 이어 놓았다.
+ * 레이저 용접 4대, 모듈 EOL 4대처럼 사이클이 긴 공정일수록 대수가 많다.
  */
-const LINE_SLOTS = [-135, -81, -27, 27, 81, 135];
+const BELT_Z = Object.freeze({ upper: -62, lower: 38 });
 
-const PROCESS_ROWS = [
+/* 벨트 양 끝의 x. 지원실과 배전반 사이에 들어가는 범위다. */
+const BELT_WEST_X = -140;
+const BELT_EAST_X = 180;
+
+/* 벨트 중심에서 설비 중심까지. 설비 앞면이 벨트 난간에 거의 닿는다. */
+const BELT_SIDE_OFFSET = 9;
+
+/* 스테이션이 늘어서는 x 범위. 세로 구간과 겹치지 않는 선이다. */
+const STATION_WEST_X = -125;
+const STATION_EAST_X = 165;
+
+const BELT_LINES = [
   {
-    z: -70,
-    zoneName: "cell-inspection-stacking",
-    machines: [
+    belt: "upper",
+
+    /* 동 → 서. 1공정과 2공정 */
+    direction: "west",
+    stations: [
       { id: "CIN-MA-01", build: createCellInspector, status: "running" },
       { id: "CIN-MA-02", build: createCellInspector, status: "running" },
       { id: "CVS-MA-01", build: createVisionInspector, status: "warning" },
@@ -837,142 +874,289 @@ const PROCESS_ROWS = [
     ],
   },
   {
-    z: -25,
-    zoneName: "laser-welding",
-    machines: [
+    belt: "lower",
+
+    /* 서 → 동. 3공정과 4공정 */
+    direction: "east",
+    stations: [
       { id: "LWD-MA-01", build: createLaserWelder, status: "running" },
       { id: "LWD-MA-02", build: createLaserWelder, status: "running" },
       { id: "LWD-MA-03", build: createLaserWelder, status: "warning" },
       { id: "LWD-MA-04", build: createLaserWelder, status: "running" },
       { id: "WVS-MA-01", build: createVisionInspector, status: "running" },
+      { id: "MEL-MA-01", build: createModuleEolTester, status: "running" },
+      { id: "MEL-MA-02", build: createModuleEolTester, status: "running" },
+      { id: "MEL-MA-03", build: createModuleEolTester, status: "running" },
+      { id: "MEL-MA-04", build: createModuleEolTester, status: "stopped" },
       { id: "HPT-MA-01", build: createHipotTester, status: "running" },
     ],
   },
 ];
 
-const MODULE_EOL_ROW = {
-  z: 30,
-  slots: [-90, -30, 30, 90],
-  machines: [
-    { id: "MEL-MA-01", status: "running" },
-    { id: "MEL-MA-02", status: "running" },
-    { id: "MEL-MA-03", status: "running" },
-    { id: "MEL-MA-04", status: "stopped" },
-  ],
-};
+export const MODULE_CONVEYOR_STATION_COUNT = BELT_LINES.reduce(
+  (total, line) => total + line.stations.length,
+  0,
+);
 
-function addProcessRows(group, materials) {
-  PROCESS_ROWS.forEach((row) => {
-    row.machines.forEach((machine, index) => {
-      const x = LINE_SLOTS[index];
+/*
+ * 한 줄에 몇 대가 오든 같은 간격으로 벌려 놓는다.
+ * 설비를 늘려도 좌표를 손댈 일이 없다.
+ */
+function placeStation(line, index) {
+  const count = line.stations.length;
+  const span = STATION_EAST_X - STATION_WEST_X;
+  const step = count > 1 ? span / (count - 1) : 0;
+  const offset = STATION_WEST_X + step * index;
+  const isNorth = index % 2 === 0;
+  const station = line.stations[index];
 
-      group.add(
-        createBox({
-          name: `${row.zoneName}-work-zone-${index + 1}`,
-          size: [17, 0.05, 13],
-          position: [x, 0.94, row.z],
-          material: materials.workZone,
-          castShadow: false,
-        }),
-        machine.build({
-          id: machine.id,
-          position: [x, 0.82, row.z],
-          materials,
-          status: machine.status,
-        }),
-      );
-    });
-  });
+  return {
+    x: line.direction === "west"
+      ? STATION_WEST_X + STATION_EAST_X - offset
+      : offset,
 
-  MODULE_EOL_ROW.machines.forEach((machine, index) => {
-    const x = MODULE_EOL_ROW.slots[index];
+    /* 북쪽 설비는 벨트가 +z 쪽, 남쪽 설비는 -z 쪽에 있다 */
+    z: BELT_Z[line.belt] + (isNorth ? -BELT_SIDE_OFFSET : BELT_SIDE_OFFSET),
+    rotationY: (isNorth ? 0 : Math.PI) + (station.facing ?? 0),
+  };
+}
 
+/*
+ * 스테이션이 벨트 경로 위 어디쯤인지 거리로 적어 둔다.
+ *
+ * 모듈 운행 시뮬레이션이 이 거리를 보고 어느 설비 앞에서 멈출지,
+ * 대기줄이 어디부터 늘어설지를 정한다.
+ */
+const UPPER_LENGTH = BELT_EAST_X - BELT_WEST_X;
+const LINK_LENGTH = BELT_Z.lower - BELT_Z.upper;
+
+function stationDistance(line, x) {
+  return line.belt === "upper"
+    ? BELT_EAST_X - x
+    : UPPER_LENGTH + LINK_LENGTH + (x - BELT_WEST_X);
+}
+
+export const MODULE_CONVEYOR_STATIONS = Object.freeze(
+  BELT_LINES.flatMap((line) =>
+    line.stations.map((station, index) => {
+      const { x } = placeStation(line, index);
+
+      return Object.freeze({
+        id: station.id,
+        belt: line.belt,
+        x,
+        distance: Number(stationDistance(line, x).toFixed(3)),
+      });
+    }),
+  ),
+);
+
+function addProcessStations(group, materials) {
+  /* 벨트를 낀 작업 구역 바닥 */
+  Object.values(BELT_Z).forEach((beltZ, index) => {
     group.add(
       createBox({
-        name: `module-eol-work-zone-${index + 1}`,
-        size: [19, 0.05, 13],
-        position: [x, 0.94, MODULE_EOL_ROW.z],
+        name: `process-belt-zone-${index + 1}`,
+        size: [UPPER_LENGTH + 16, 0.05, BELT_SIDE_OFFSET * 2 + 12],
+        position: [
+          (BELT_WEST_X + BELT_EAST_X) / 2,
+          0.94,
+          beltZ,
+        ],
         material: materials.workZone,
         castShadow: false,
       }),
-      createModuleEolTester({
-        id: machine.id,
-        position: [x, 0.82, MODULE_EOL_ROW.z],
-        materials,
-        status: machine.status,
-      }),
     );
+  });
+
+  BELT_LINES.forEach((line) => {
+    line.stations.forEach((station, index) => {
+      const { x, z, rotationY } = placeStation(line, index);
+
+      group.add(
+        station.build({
+          id: station.id,
+          position: [x, 0.82, z],
+          rotationY,
+          materials,
+          status: station.status,
+        }),
+      );
+    });
   });
 }
 
 
 /*
- * 공정 간 이송 컨베이어.
+ * ㄷ자 이송 컨베이어.
  *
- * 셀검사·스태킹 행과 레이저 용접 행 사이를 지나며
- * 두 공정을 잇는 라인의 척추 역할을 한다.
+ * 상단 가로로 서진하고, 서쪽 세로 구간에서 방향을 틀어
+ * 하단 가로로 다시 동진한다. 평면에서 보면 ㄷ 모양이다.
+ *
+ * 아래 좌표는 모듈이 실제로 얹혀 도는 경로이기도 해서
+ * packConveyorController 가 그대로 받아 쓴다.
  */
+export const MODULE_CONVEYOR_PATH = Object.freeze([
+  Object.freeze([BELT_EAST_X, 2.7, BELT_Z.upper]),
+  Object.freeze([BELT_WEST_X, 2.7, BELT_Z.upper]),
+  Object.freeze([BELT_WEST_X, 2.7, BELT_Z.lower]),
+  Object.freeze([BELT_EAST_X, 2.7, BELT_Z.lower]),
+]);
+
+const CONVEYOR_WIDTH = 6;
+
+/*
+ * 직선 구간 하나를 만든다.
+ * from, to 는 [x, z] 이고 축은 둘 중 달라진 쪽으로 정한다.
+ */
+function addConveyorRun({ conveyor, name, from, to, materials }) {
+  const isHorizontal = from[1] === to[1];
+  const length = isHorizontal
+    ? Math.abs(to[0] - from[0])
+    : Math.abs(to[1] - from[1]);
+  const centerX = (from[0] + to[0]) / 2;
+  const centerZ = (from[1] + to[1]) / 2;
+  const railOffset = CONVEYOR_WIDTH / 2 + 0.15;
+  const start = isHorizontal
+    ? Math.min(from[0], to[0])
+    : Math.min(from[1], to[1]);
+
+  conveyor.add(
+    createBox({
+      name: `${name}-belt`,
+      size: isHorizontal
+        ? [length, 0.65, CONVEYOR_WIDTH]
+        : [CONVEYOR_WIDTH, 0.65, length],
+      position: [centerX, 2.35, centerZ],
+      material: materials.conveyorBelt,
+    }),
+  );
+
+  [-railOffset, railOffset].forEach((offset, index) => {
+    conveyor.add(
+      createBox({
+        name: `${name}-rail-${index + 1}`,
+        size: isHorizontal
+          ? [length, 1.15, 0.35]
+          : [0.35, 1.15, length],
+        position: isHorizontal
+          ? [centerX, 2.65, centerZ + offset]
+          : [centerX + offset, 2.65, centerZ],
+        material: materials.conveyor,
+      }),
+    );
+  });
+
+  for (let distance = 4; distance <= length - 4; distance += 8) {
+    const roller = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.28, CONVEYOR_WIDTH + 0.15, 12),
+      materials.conveyor,
+    );
+
+    roller.name = `${name}-roller`;
+    roller.rotation[isHorizontal ? "x" : "z"] = Math.PI / 2;
+    roller.position.set(
+      isHorizontal ? start + distance : centerX,
+      2.78,
+      isHorizontal ? centerZ : start + distance,
+    );
+    roller.castShadow = true;
+    conveyor.add(roller);
+  }
+
+  for (let distance = 12; distance <= length - 12; distance += 24) {
+    const supportOffset = CONVEYOR_WIDTH / 2 - 0.55;
+
+    [-supportOffset, supportOffset].forEach((offset, index) => {
+      conveyor.add(
+        createBox({
+          name: `${name}-support-${index + 1}`,
+          size: [0.5, 2.2, 0.5],
+          position: isHorizontal
+            ? [start + distance, 1.2, centerZ + offset]
+            : [centerX + offset, 1.2, start + distance],
+          material: materials.conveyor,
+        }),
+      );
+    });
+  }
+}
+
+/*
+ * 코너 이송 데크.
+ * 직각으로 방향을 바꾸는 자리라 벨트 대신 회전 테이블을 둔다.
+ */
+function addConveyorCorner({ conveyor, name, position, materials }) {
+  const turntable = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.2, 3.2, 0.5, 24),
+    materials.conveyor,
+  );
+
+  turntable.name = `${name}-turntable`;
+  turntable.position.set(position[0], 2.75, position[1]);
+  turntable.castShadow = true;
+
+  conveyor.add(
+    createBox({
+      name: `${name}-deck`,
+      size: [CONVEYOR_WIDTH + 2, 0.65, CONVEYOR_WIDTH + 2],
+      position: [position[0], 2.35, position[1]],
+      material: materials.conveyorBelt,
+    }),
+    createBox({
+      name: `${name}-support`,
+      size: [0.6, 2.2, 0.6],
+      position: [position[0], 1.2, position[1]],
+      material: materials.conveyor,
+    }),
+    turntable,
+  );
+}
+
 function addProcessConveyor(group, materials) {
   const conveyor = new THREE.Group();
 
   conveyor.name = "factory-a-process-conveyor";
-  conveyor.position.set(0, 0.8, -47);
+  conveyor.position.y = 0.8;
   conveyor.userData = {
     equipmentId: "CNV-MA-01",
     equipmentType: "conveyor",
     status: "running",
   };
 
-  conveyor.add(
-    createBox({
-      name: "process-conveyor-zone",
-      size: [310, 0.05, 9],
-      position: [0, 0.12, 0],
-      material: materials.workZone,
-      castShadow: false,
-    }),
-    createBox({
-      name: "process-conveyor-belt",
-      size: [300, 0.65, 4.2],
-      position: [0, 2.35, 0],
-      material: materials.conveyorBelt,
-    }),
-  );
+  addConveyorRun({
+    conveyor,
+    name: "process-conveyor-upper",
+    from: [BELT_EAST_X, BELT_Z.upper],
+    to: [BELT_WEST_X, BELT_Z.upper],
+    materials,
+  });
+  addConveyorRun({
+    conveyor,
+    name: "process-conveyor-link",
+    from: [BELT_WEST_X, BELT_Z.upper],
+    to: [BELT_WEST_X, BELT_Z.lower],
+    materials,
+  });
+  addConveyorRun({
+    conveyor,
+    name: "process-conveyor-lower",
+    from: [BELT_WEST_X, BELT_Z.lower],
+    to: [BELT_EAST_X, BELT_Z.lower],
+    materials,
+  });
 
-  for (let x = -146; x <= 146; x += 8) {
-    const roller = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.32, 0.32, 4.4, 12),
-      materials.conveyor,
-    );
-
-    roller.name = "process-conveyor-roller";
-    roller.rotation.x = Math.PI / 2;
-    roller.position.set(x, 2.78, 0);
-    roller.castShadow = true;
-    conveyor.add(roller);
-  }
-
-  for (let x = -140; x <= 140; x += 28) {
-    conveyor.add(
-      createBox({
-        name: "process-conveyor-leg",
-        size: [0.65, 2.2, 3.6],
-        position: [x, 1.2, 0],
-        material: materials.conveyor,
-      }),
-    );
-  }
-
-  /* 이송 중인 셀 스택과 모듈 */
-  [-118, -62, -6, 46, 104].forEach((x, index) => {
-    conveyor.add(
-      createBox({
-        name: `process-carrier-${index + 1}`,
-        size: [5.2, 1.6, 3.4],
-        position: [x, 3.6, 0],
-        material: index % 2 === 0 ? materials.cell : materials.accent,
-      }),
-    );
+  addConveyorCorner({
+    conveyor,
+    name: "process-conveyor-corner-1",
+    position: [BELT_WEST_X, BELT_Z.upper],
+    materials,
+  });
+  addConveyorCorner({
+    conveyor,
+    name: "process-conveyor-corner-2",
+    position: [BELT_WEST_X, BELT_Z.lower],
+    materials,
   });
 
   group.add(conveyor);
@@ -1196,7 +1380,7 @@ export function createFactoryAInterior(parent) {
 
   group.name = "factory-a-interior";
   addFloorAndLighting(group, materials);
-  addProcessRows(group, materials);
+  addProcessStations(group, materials);
   addProcessConveyor(group, materials);
   addStorageAndControls(group, materials);
   addAnnexSupportEquipment(group, materials);

@@ -13,6 +13,28 @@ const TEMPERATURE_OFFSETS = [
   0.3, 1.1, 0.8, 1.5, 1.1, 0,
 ];
 
+/*
+ * 모듈 한 대에 들어가는 셀 수.
+ *
+ * 셀 검사 설비는 셀 한 장씩 처리하지만 라인에 흐르는 것은 모듈이다.
+ * 그래서 라인 관점의 사이클은 셀당 시간에 이 수를 곱한 값이다.
+ */
+const CELLS_PER_MODULE = 12;
+
+/*
+ * 1분이 넘는 공정은 초로만 적으면 길이가 잘 안 와닿는다.
+ */
+function formatCycleTime(seconds) {
+  if (seconds < 60) {
+    return `${seconds.toFixed(1)}초`;
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const rest = Math.round(seconds % 60);
+
+  return rest > 0 ? `${minutes}분 ${rest}초` : `${minutes}분`;
+}
+
 function createTemperatureHistory(baseTemperature) {
   return TEMPERATURE_OFFSETS.map((offset, index) => ({
     time: `${String(9 + Math.floor(index / 6)).padStart(2, "0")}:${String((index % 6) * 10).padStart(2, "0")}`,
@@ -30,7 +52,7 @@ function createTemperatureHistory(baseTemperature) {
 function createEquipment({
   id, name, type, typeLabel, processStep, status, location,
   description, temperature, metrics, workOrder, product,
-  target, completed, unit = "EA", cycleTime,
+  target, completed, unit = "EA", cycleSeconds, cycleLabel,
   lastInspection = "2026-09-05", nextInspection = "2026-10-05",
   operatingHours = "4,120 h", detailCategory,
   alert = "현재 감지된 이상이 없습니다.",
@@ -58,7 +80,15 @@ function createEquipment({
     ],
     temperatureHistory: createTemperatureHistory(temperature),
     production: {
-      workOrder, product, target, completed, unit, cycleTime,
+      workOrder, product, target, completed, unit,
+
+      /*
+       * 설비가 쉬고 있어도 설비 자체의 사이클은 그대로다.
+       * 라인 택트 계산에는 설치 기준 값을 쓰고,
+       * 화면에는 지금 상태를 보여 준다.
+       */
+      cycleSeconds,
+      cycleTime: cycleLabel ?? formatCycleTime(cycleSeconds),
     },
     maintenance: {
       lastInspection, nextInspection, operatingHours,
@@ -78,14 +108,14 @@ const CELL_INSPECTION_CONFIGS = [
   {
     id: "CIN-MA-01", name: "1호 셀 전기특성 검사기",
     status: "running", temperature: 27.4,
-    ocv: 3.684, resistance: 0.42, rejectRate: 0.34,
+    ocv: 3.684, resistance: 0.42, rejectRate: 0.34, perCellSeconds: 2.4,
     product: "CELL-P71", part: "각형 셀",
     completed: 4820, target: 6400,
   },
   {
     id: "CIN-MA-02", name: "2호 셀 전기특성 검사기",
     status: "running", temperature: 28.1,
-    ocv: 3.691, resistance: 0.44, rejectRate: 0.41,
+    ocv: 3.691, resistance: 0.44, rejectRate: 0.41, perCellSeconds: 2.6,
     product: "CELL-P71", part: "각형 셀",
     completed: 4655, target: 6400,
   },
@@ -104,10 +134,13 @@ const cellInspectors = CELL_INSPECTION_CONFIGS.map((config, index) =>
       { label: "평균 개방전압", value: config.ocv, unit: "V" },
       { label: "내부저항", value: config.resistance, unit: "mΩ", emphasis: config.resistance >= 0.5 },
       { label: "선별 불합격률", value: config.rejectRate, unit: "%", emphasis: config.rejectRate >= 0.6 },
+      { label: "셀당 측정", value: config.perCellSeconds, unit: "초" },
     ],
     workOrder: `WO-YC-260922-I${String(index + 1).padStart(2, "0")}`,
     unit: "Cell",
-    cycleTime: `${(2.4 + index * 0.2).toFixed(1)}초`,
+    cycleSeconds: Number(
+      (config.perCellSeconds * CELLS_PER_MODULE).toFixed(1),
+    ),
     operatingHours: `${(5240 + index * 380).toLocaleString("ko-KR")} h`,
   }),
 );
@@ -127,13 +160,14 @@ const cellVisionInspector = createEquipment({
     { label: "금일 검사", value: "9,475", unit: "Cell" },
     { label: "양품률", value: 99.2, unit: "%" },
     { label: "불량 검출", value: 76, unit: "Cell", emphasis: true },
+    { label: "셀당 측정", value: 1.8, unit: "초" },
   ],
   workOrder: "QC-YC-260922-I03",
   product: "CELL-P71",
   target: 12800,
   completed: 9475,
   unit: "Cell",
-  cycleTime: "1.8초",
+  cycleSeconds: Number((1.8 * CELLS_PER_MODULE).toFixed(1)),
   lastInspection: "2026-08-30",
   nextInspection: "2026-09-30",
   operatingHours: "4,982 h",
@@ -188,7 +222,8 @@ const stackingCells = STACKING_CONFIGS.map((config, index) =>
       { label: "적층 정렬 오차", value: config.alignment, unit: "mm", emphasis: config.alignment >= 0.1 },
     ],
     workOrder: `WO-YC-260922-S${String(index + 1).padStart(2, "0")}`,
-    cycleTime: config.status === "idle" ? "대기" : `${(58.4 + index * 2.1).toFixed(1)}초`,
+    cycleSeconds: Number((58.4 + index * 2.1).toFixed(1)),
+    cycleLabel: config.status === "idle" ? "대기" : undefined,
     operatingHours: `${(4180 + index * 296).toLocaleString("ko-KR")} h`,
   }),
 );
@@ -249,7 +284,7 @@ const laserWelders = WELDING_CONFIGS.map((config, index) =>
       { label: "접촉 저항", value: config.resistance, unit: "mΩ", emphasis: config.resistance >= 0.06 },
     ],
     workOrder: `WO-YC-260922-W${String(index + 1).padStart(2, "0")}`,
-    cycleTime: `${(41.6 + index * 1.4).toFixed(1)}초`,
+    cycleSeconds: Number((41.6 + index * 1.4).toFixed(1)),
     operatingHours: `${(5620 + index * 418).toLocaleString("ko-KR")} h`,
   }),
 );
@@ -274,7 +309,7 @@ const weldVisionInspector = createEquipment({
   product: "BM-P12",
   target: 2000,
   completed: 1375,
-  cycleTime: "12.4초",
+  cycleSeconds: 12.4,
   lastInspection: "2026-09-01",
   nextInspection: "2026-10-01",
   operatingHours: "5,108 h",
@@ -335,7 +370,8 @@ const moduleEolTesters = MODULE_EOL_CONFIGS.map((config, index) =>
       { label: "셀 전압 편차", value: config.deviation || "-", unit: config.deviation ? "mV" : "", emphasis: config.deviation >= 20 },
     ],
     workOrder: `WO-YC-260922-E${String(index + 1).padStart(2, "0")}`,
-    cycleTime: config.status === "stopped" ? "정지" : `${(186 + index * 4).toFixed(0)}초`,
+    cycleSeconds: 186 + index * 4,
+    cycleLabel: config.status === "stopped" ? "정지" : undefined,
     operatingHours: `${(4460 + index * 312).toLocaleString("ko-KR")} h`,
   }),
 );
@@ -360,7 +396,7 @@ const hipotTester = createEquipment({
   product: "BM-P12",
   target: 1920,
   completed: 1193,
-  cycleTime: "24.8초",
+  cycleSeconds: 24.8,
   lastInspection: "2026-09-03",
   nextInspection: "2026-10-03",
   operatingHours: "4,336 h",
@@ -378,6 +414,7 @@ const moduleConveyor = createEquipment({
   type: "conveyor",
   typeLabel: "공정 간 이송 설비",
   processStep: "stacking",
+  detailCategory: "support",
   status: "running",
   temperature: 37.2,
   location: "모듈 조립동 · 공정 이송 라인",
@@ -392,7 +429,7 @@ const moduleConveyor = createEquipment({
   product: "셀 스택·모듈 이송",
   target: 1920,
   completed: 1204,
-  cycleTime: "42.8초",
+  cycleLabel: "연속 운전",
   lastInspection: "2026-08-30",
   nextInspection: "2026-09-30",
   operatingHours: "6,284 h",
@@ -430,7 +467,7 @@ const supportEquipment = [
     target: 24,
     completed: 18,
     unit: "h",
-    cycleTime: "연속 운전",
+    cycleLabel: "연속 운전",
     lastInspection: "2026-09-02",
     nextInspection: "2026-10-02",
     operatingHours: "4,812 h",
@@ -458,7 +495,7 @@ const supportEquipment = [
     target: 24,
     completed: 17,
     unit: "h",
-    cycleTime: "연속 운전",
+    cycleLabel: "연속 운전",
     lastInspection: "2026-08-14",
     nextInspection: "2026-09-14",
     operatingHours: "5,327 h",
@@ -486,7 +523,7 @@ const supportEquipment = [
     target: 24,
     completed: 19,
     unit: "h",
-    cycleTime: "부하·무부하 제어",
+    cycleLabel: "부하·무부하 제어",
     lastInspection: "2026-08-28",
     nextInspection: "2026-09-28",
     operatingHours: "7,146 h",

@@ -80,8 +80,14 @@ import {
 } from "./interiors/createFactoryBInterior.js";
 
 import {
-  PACK_LINE_TAKT_SECONDS,
-} from "./data/packLineBalance.js";
+  MODULE_CONVEYOR_PATH,
+  MODULE_CONVEYOR_STATIONS,
+} from "./interiors/createFactoryAInterior.js";
+
+import {
+  calculateLineBalance,
+  createStationStateReader,
+} from "./data/lineBalance.js";
 
 import {
   createLogisticsOperationController,
@@ -312,29 +318,53 @@ const equipmentStatusVisualController =
  * 팩 조립동 ㄷ자 컨베이어 운행.
  * 설비 상태가 멈춤으로 바뀌면 벨트도 함께 선다.
  */
+/*
+ * 생산 라인 운행.
+ *
+ * 두 생산동 모두 ㄷ자 벨트에 설비가 붙어 있고, 팩과 모듈이 그 위를
+ * 하나씩 지나간다. 컨트롤러는 같은 것을 쓰고 경로와 스테이션만 다르다.
+ *
+ * 설계 택트는 설비를 깐 대로 계산해 이동 속도를 잡는 데 쓰고,
+ * 실제 운행은 아래 getStationState 가 넘기는 현재 상태를 따른다.
+ * 설비가 멈추면 그 자리는 못 쓰는 창구가 되어 앞 공정에 줄이 선다.
+ */
+const designStationState = createStationStateReader(EQUIPMENT_DATA);
+
+function createLiveStationState(stationId) {
+  const equipment = equipmentStore.getEquipmentById(stationId);
+
+  return {
+    type: equipment?.type,
+    cycleSeconds: equipment?.production?.cycleSeconds ?? 60,
+    available:
+      equipment?.status !== "idle" && equipment?.status !== "stopped",
+  };
+}
+
+const moduleConveyorController =
+  createPackConveyorController({
+    parent: factory.interior,
+    path: MODULE_CONVEYOR_PATH,
+    stations: MODULE_CONVEYOR_STATIONS,
+    taktSeconds: calculateLineBalance(
+      MODULE_CONVEYOR_STATIONS,
+      designStationState,
+    ).taktSeconds,
+    getStationState: createLiveStationState,
+    equipmentId: "CNV-MA-01",
+    equipmentStore,
+  });
+
 const packConveyorController =
   createPackConveyorController({
     parent: factoryB.interior,
     path: PACK_CONVEYOR_PATH,
     stations: PACK_CONVEYOR_STATIONS,
-    taktSeconds: PACK_LINE_TAKT_SECONDS,
-
-    /*
-     * 팩 운행 시뮬레이션이 설비의 현재 상태를 그대로 본다.
-     * 설비가 멈추면 그 자리는 못 쓰는 창구가 되어
-     * 앞 공정에 팩이 밀리기 시작한다.
-     */
-    getStationState(stationId) {
-      const equipment = equipmentStore.getEquipmentById(stationId);
-
-      return {
-        type: equipment?.type,
-        cycleSeconds: equipment?.production?.cycleSeconds ?? 60,
-        available:
-          equipment?.status !== "idle" && equipment?.status !== "stopped",
-      };
-    },
-
+    taktSeconds: calculateLineBalance(
+      PACK_CONVEYOR_STATIONS,
+      designStationState,
+    ).taktSeconds,
+    getStationState: createLiveStationState,
     equipmentId: "CNV-PA-01",
     equipmentStore,
   });
@@ -1325,6 +1355,10 @@ function animate(animationTime) {
     deltaSeconds,
   );
 
+  moduleConveyorController.update(
+    deltaSeconds,
+  );
+
   packConveyorController.update(
     deltaSeconds,
   );
@@ -1459,6 +1493,7 @@ window.addEventListener(
     equipmentDetailPanel.destroy();
     facilityLabelController.destroy();
     pipeFlowController.destroy();
+    moduleConveyorController.destroy();
     packConveyorController.destroy();
     logisticsOperationController.destroy();
     equipmentStatusVisualController.destroy();

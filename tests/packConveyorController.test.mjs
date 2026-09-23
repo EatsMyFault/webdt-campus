@@ -13,7 +13,10 @@ import {
   PACK_CONVEYOR_STATIONS,
 } from "../src/interiors/createFactoryBInterior.js";
 
-import { PACK_LINE_TAKT_SECONDS } from "../src/data/packLineBalance.js";
+import {
+  calculateLineBalance,
+  createStationStateReader,
+} from "../src/data/lineBalance.js";
 import { createEquipmentStore } from "../src/data/equipmentStore.js";
 import { PACK_ASSEMBLY_EQUIPMENT } from "../src/data/packAssemblyEquipmentData.js";
 
@@ -26,7 +29,10 @@ function createController(store, { warmUpSeconds = 5400 } = {}) {
     parent,
     path: PACK_CONVEYOR_PATH,
     stations: PACK_CONVEYOR_STATIONS,
-    taktSeconds: PACK_LINE_TAKT_SECONDS,
+    taktSeconds: calculateLineBalance(
+      PACK_CONVEYOR_STATIONS,
+      createStationStateReader(PACK_ASSEMBLY_EQUIPMENT),
+    ).taktSeconds,
     warmUpSeconds,
     equipmentId: "CNV-PA-01",
     equipmentStore: store,
